@@ -1,10 +1,10 @@
 # FleetBooking Plugin - Template for pt_BR
 msgid ""
 msgstr ""
-"Project-Id-Version: FleetBooking 1.0.5\n"
-"POT-Creation-Date: 2026-05-23\n"
-"PO-Revision-Date: 2026-05-23\n"
-"Last-Translator: Getsmart\n"
+"Project-Id-Version: FleetBooking 1.0.6\n"
+"POT-Creation-Date: 2026-05-29\n"
+"PO-Revision-Date: 2026-05-29\n"
+"Last-Translator: Francisco Neto\n"
 "Language-Team: Portuguese (Brazil)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,7 +50,7 @@ msgstr "Aviso: A alteração desta entidade migrará automaticamente todos os ch
 
 # --- Types ---
 msgid "Fleet Booking"
-msgstr "Reserva de Frota"
+msgstr "Fleet Booking"
 
 msgid "Fleet Booking Request"
 msgid_plural "Fleet Booking Requests"

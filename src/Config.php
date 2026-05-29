@@ -102,7 +102,7 @@ class Config extends CommonDBTM
             // Use the custom asset class only when the optional plugin is active;
             // otherwise leave the field empty so the admin is forced to choose a
             // valid itemtype before the plugin can be used.
-            $vehicleItemtype = 'Glpi\CustomAsset\VehicleFleetAsset';
+            $vehicleItemtype = 'Glpi\CustomAsset\VeiculofrotaAsset';
             if (!class_exists($vehicleItemtype)) {
                 $vehicleItemtype = '';
             }

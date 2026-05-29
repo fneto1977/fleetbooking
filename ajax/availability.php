@@ -41,7 +41,7 @@ foreach ($type_result as $row) {
     }
 }
 // Fallback: always allow the default asset type
-$allowed_itemtypes['Glpi\CustomAsset\VehicleFleetAsset'] = true;
+$allowed_itemtypes['Glpi\CustomAsset\VeiculofrotaAsset'] = true;
 
 if (!isset($allowed_itemtypes[$itemtype])) {
     echo json_encode(['ok' => false, 'errors' => [__('Invalid vehicle type', 'fleetbooking')]]);

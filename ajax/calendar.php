@@ -73,7 +73,7 @@ if ($items_id > 0 && $itemtype !== '' && class_exists($itemtype)) {
             $allowed_itemtypes[$row['vehicle_itemtype']] = true;
         }
     }
-    $allowed_itemtypes['Glpi\CustomAsset\VehicleFleetAsset'] = true;
+    $allowed_itemtypes['Glpi\CustomAsset\VeiculofrotaAsset'] = true;
 
     if (isset($allowed_itemtypes[$itemtype])) {
         $vehicle = new $itemtype();

@@ -94,6 +94,19 @@ function plugin_fleetbooking_install_db()
         }
     }
 
+    // Auto-assign full rights to Super-Admin profile (id=4).
+    // rights = READ|UPDATE|CREATE|DELETE|PURGE = 31.
+    // updateOrInsert guarantees this even when addProfileRights() already
+    // created the row with rights=0.
+    $superAdminId = 4;
+    foreach ($all_rights as $right) {
+        $DB->updateOrInsert(
+            'glpi_profilerights',
+            ['rights' => 31],
+            ['profiles_id' => $superAdminId, 'name' => $right]
+        );
+    }
+
     plugin_fleetbooking_create_vehicle_asset();
 
     return true;
@@ -116,7 +129,7 @@ function plugin_fleetbooking_create_vehicle_asset()
         return;
     }
 
-    $system_name = 'VehicleFleet';
+    $system_name = 'veiculofrota';
 
     // Check if the Asset Definition already exists
     $existing = $DB->request([
@@ -124,127 +137,113 @@ function plugin_fleetbooking_create_vehicle_asset()
         'WHERE' => ['system_name' => $system_name]
     ]);
 
+    // GLPI 11 format: capacities must be objects with "name" and "config" keys.
+    $capacities = [
+        ['name' => 'Glpi\\Asset\\Capacity\\HasInfocomCapacity',             'config' => []],
+        ['name' => 'Glpi\\Asset\\Capacity\\HasDocumentsCapacity',           'config' => []],
+        ['name' => 'Glpi\\Asset\\Capacity\\AllowedInGlobalSearchCapacity',  'config' => []],
+        ['name' => 'Glpi\\Asset\\Capacity\\HasContractsCapacity',           'config' => []],
+        ['name' => 'Glpi\\Asset\\Capacity\\IsReservableCapacity',           'config' => []],
+    ];
+
+    // GLPI 11 format: fields_display must be objects with "key", "order", and "field_options".
+    $fieldsDisplay = [
+        ['key' => 'name',                   'order' => 0,  'field_options' => []],
+        ['key' => 'template_name',          'order' => 1,  'field_options' => []],
+        ['key' => 'states_id',              'order' => 2,  'field_options' => []],
+        ['key' => 'locations_id',           'order' => 3,  'field_options' => []],
+        ['key' => 'assets_assettypes_id',   'order' => 4,  'field_options' => []],
+        ['key' => 'manufacturers_id',       'order' => 5,  'field_options' => []],
+        ['key' => 'groups_id_tech',         'order' => 6,  'field_options' => []],
+        ['key' => 'assets_assetmodels_id',  'order' => 7,  'field_options' => []],
+        ['key' => 'users_id',               'order' => 8,  'field_options' => []],
+        ['key' => 'groups_id',              'order' => 9,  'field_options' => []],
+        ['key' => 'comment',                'order' => 10, 'field_options' => []],
+        ['key' => 'custom_placa',           'order' => 11, 'field_options' => ['full_width' => '0', 'required' => '1', 'readonly' => '', 'hidden' => '']],
+        ['key' => 'custom_km_inicial',      'order' => 12, 'field_options' => ['full_width' => '0', 'required' => '0', 'readonly' => '', 'hidden' => '']],
+    ];
+
+    $label = __('Veículo-frota', 'fleetbooking');
+
     $assetDefId = 0;
     if ($existing_row = $existing->current()) {
         $assetDefId = $existing_row['id'];
-    } else {
-        // Create the Asset Definition
-        $assetDef = new \Glpi\Asset\AssetDefinition();
-        $fieldsDisplay = [
-            'left' => [
-                'name',
-                'states_id',
-                'assettypes_id',
-                'groups_id_tech',
-                'users_id',
-                'comment',
-                'custom_initial_mileage'
-            ],
-            'right' => [
-                'is_template',
-                'locations_id',
-                'manufacturers_id',
-                'models_id',
-                'groups_id',
-                'custom_license_plate'
-            ]
-        ];
 
-        $input = [
-            'system_name' => $system_name,
-            'icon' => 'ti-car',
-            'is_active' => 1,
-            'comment' => __('Created automatically by FleetBooking plugin', 'fleetbooking'),
-            'capacities' => json_encode([
-                'Glpi\Asset\Capacity\HasInfocomCapacity',
-                'Glpi\Asset\Capacity\HasDocumentsCapacity',
-                'Glpi\Asset\Capacity\AllowedInGlobalSearchCapacity',
-                'Glpi\Asset\Capacity\HasContractsCapacity',
-                'Glpi\Asset\Capacity\IsReservableCapacity',
-            ]),
+        $DB->update('glpi_assets_assetdefinitions', [
+            'label'         => $label,
+            'icon'          => 'ti-car-garage',
+            'is_active'     => 1,
+            'capacities'    => json_encode($capacities),
             'fields_display' => json_encode($fieldsDisplay),
-        ];
+        ], ['id' => $assetDefId]);
+    } else {
+        $DB->insert('glpi_assets_assetdefinitions', [
+            'system_name'   => $system_name,
+            'label'         => $label,
+            'icon'          => 'ti-car-garage',
+            'is_active'     => 1,
+            'comment'       => __('Created automatically by FleetBooking plugin', 'fleetbooking'),
+            'capacities'    => json_encode($capacities),
+            'profiles'      => '[]',
+            'translations'  => '{}',
+            'fields_display' => json_encode($fieldsDisplay),
+        ]);
 
-        if ($DB->fieldExists('glpi_assets_assetdefinitions', 'label')) {
-            $input['label'] = __('Vehicle-Fleet', 'fleetbooking');
-        } else {
-            $input['name'] = __('Vehicle-Fleet', 'fleetbooking');
-        }
-
-        $assetDefId = $assetDef->add($input);
+        $assetDefId = (int) $DB->insert_id;
     }
 
     if ($assetDefId > 0 && class_exists('Glpi\Asset\CustomFieldDefinition')) {
-        // Check if custom field Initial Mileage exists
+        // Remove stale custom fields from previous versions (different system_name)
+        $DB->delete('glpi_assets_customfielddefinitions', [
+            'assets_assetdefinitions_id' => $assetDefId,
+            'OR' => [
+                ['system_name' => 'initial_mileage'],
+                ['system_name' => 'license_plate'],
+            ],
+        ]);
+
+        // Check if custom field KM Inicial exists
         $existingKm = $DB->request([
-            'FROM' => 'glpi_assets_customfielddefinitions',
+            'FROM'  => 'glpi_assets_customfielddefinitions',
             'WHERE' => [
                 'assets_assetdefinitions_id' => $assetDefId,
-                'OR' => [
-                    ['system_name' => 'initial_mileage'],
-                    ['name' => 'initial_mileage']
-                ]
-            ]
+                'system_name'               => 'km_inicial',
+            ],
         ]);
 
         if (count($existingKm) == 0) {
-            $fieldKm = new \Glpi\Asset\CustomFieldDefinition();
-            $fieldInput = [
+            // GLPI 11: default_value must be JSON-encoded (post_getFromDB calls json_decode on it).
+            // translations must be a JSON array '[]', not an object '{}'.
+            $DB->insert('glpi_assets_customfielddefinitions', [
                 'assets_assetdefinitions_id' => $assetDefId,
-                'type' => 'Glpi\Asset\CustomFieldType\NumberType',
-                'default_value' => '0',
+                'system_name'   => 'km_inicial',
+                'label'         => __('KM Inicial', 'fleetbooking'),
+                'type'          => 'Glpi\\Asset\\CustomFieldType\\NumberType',
+                'default_value' => json_encode(0),
                 'field_options' => json_encode(['min' => 0, 'step' => 1]),
-            ];
-
-            if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'system_name')) {
-                $fieldInput['system_name'] = 'initial_mileage';
-            } else {
-                $fieldInput['name'] = 'initial_mileage';
-            }
-
-            if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'label')) {
-                $fieldInput['label'] = __('Initial Mileage', 'fleetbooking');
-            } else if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'name') && !isset($fieldInput['name'])) {
-                $fieldInput['name'] = __('Initial Mileage', 'fleetbooking');
-            }
-
-            $fieldKm->add($fieldInput);
+                'translations'  => '[]',
+            ]);
         }
 
-        // Check if custom field License Plate exists
+        // Check if custom field Placa exists
         $existingPlaca = $DB->request([
-            'FROM' => 'glpi_assets_customfielddefinitions',
+            'FROM'  => 'glpi_assets_customfielddefinitions',
             'WHERE' => [
                 'assets_assetdefinitions_id' => $assetDefId,
-                'OR' => [
-                    ['system_name' => 'license_plate'],
-                    ['name' => 'license_plate']
-                ]
-            ]
+                'system_name'               => 'placa',
+            ],
         ]);
 
         if (count($existingPlaca) == 0) {
-            $fieldPlaca = new \Glpi\Asset\CustomFieldDefinition();
-            $fieldInput = [
+            $DB->insert('glpi_assets_customfielddefinitions', [
                 'assets_assetdefinitions_id' => $assetDefId,
-                'type' => 'Glpi\Asset\CustomFieldType\StringType',
-                'default_value' => '',
-                'field_options' => json_encode([]),
-            ];
-
-            if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'system_name')) {
-                $fieldInput['system_name'] = 'license_plate';
-            } else {
-                $fieldInput['name'] = 'license_plate';
-            }
-
-            if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'label')) {
-                $fieldInput['label'] = __('License Plate', 'fleetbooking');
-            } else if ($DB->fieldExists('glpi_assets_customfielddefinitions', 'name') && !isset($fieldInput['name'])) {
-                $fieldInput['name'] = __('License Plate', 'fleetbooking');
-            }
-
-            $fieldPlaca->add($fieldInput);
+                'system_name'   => 'placa',
+                'label'         => __('Placa', 'fleetbooking'),
+                'type'          => 'Glpi\\Asset\\CustomFieldType\\StringType',
+                'default_value' => json_encode(''),
+                'field_options' => '{}',
+                'translations'  => '[]',
+            ]);
         }
     }
 
@@ -256,7 +255,7 @@ function plugin_fleetbooking_create_vehicle_asset()
             'WHERE' => ['entities_id' => 0]
         ])->current();
 
-        $vehicleItemtype = 'Glpi\CustomAsset\VehicleFleetAsset';
+        $vehicleItemtype = 'Glpi\CustomAsset\VeiculofrotaAsset';
 
         if ($existingConfig) {
             if (empty($existingConfig['vehicle_itemtype'])) {

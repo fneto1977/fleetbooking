@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_FLEETBOOKING_VERSION', '1.0.5');
+define('PLUGIN_FLEETBOOKING_VERSION', '1.0.6');
 
 define('PLUGIN_FLEETBOOKING_MIN_GLPI_VERSION', '11.0.0');
 
@@ -53,9 +53,9 @@ function plugin_init_fleetbooking()
 function plugin_version_fleetbooking()
 {
     return [
-        'name' => __('Fleet Booking', 'fleetbooking'),
+        'name' => 'Fleet Booking',
         'version' => PLUGIN_FLEETBOOKING_VERSION,
-        'author' => 'Getsmart',
+        'author' => 'Francisco Neto, Getsmart',
         'license' => 'GPLv3+',
         'homepage' => '',
         'requirements' => [

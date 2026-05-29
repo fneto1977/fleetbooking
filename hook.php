@@ -5,7 +5,8 @@
  *
  * @return boolean
  */
-function plugin_fleetbooking_install() {
+function plugin_fleetbooking_install()
+{
     global $DB;
 
     // Execute install.php if it exists
@@ -28,11 +29,12 @@ function plugin_fleetbooking_install() {
  * @param string $old_version
  * @return boolean
  */
-function plugin_fleetbooking_upgrade($old_version) {
+function plugin_fleetbooking_upgrade($old_version)
+{
     global $DB;
     // We simply run install again to ensure tables and paths are correct
     $res = plugin_fleetbooking_install();
-    
+
     if ($res) {
         // Enforce version bump in DB dynamically to avoid GLPI looping the update state
         $DB->updateOrInsert(
@@ -41,7 +43,7 @@ function plugin_fleetbooking_upgrade($old_version) {
             ['directory' => 'fleetbooking']
         );
     }
-    
+
     return $res;
 }
 
@@ -50,7 +52,8 @@ function plugin_fleetbooking_upgrade($old_version) {
  *
  * @return boolean
  */
-function plugin_fleetbooking_uninstall() {
+function plugin_fleetbooking_uninstall()
+{
     global $DB;
 
     $tables = [
@@ -68,6 +71,24 @@ function plugin_fleetbooking_uninstall() {
 
     // Remove rights
     $DB->delete('glpi_profilerights', ['name' => ['LIKE', 'fleetbooking%']]);
+
+    // Clean up custom asset definitions created by plugin (any system_name variant)
+    $assetSystemNames = ['veiculofrota', 'VehicleFleet'];
+    foreach ($assetSystemNames as $sysName) {
+        $assetDef = $DB->request([
+            'SELECT' => ['id'],
+            'FROM' => 'glpi_assets_assetdefinitions',
+            'WHERE' => ['system_name' => $sysName]
+        ])->current();
+
+        if ($assetDef) {
+            $assetDefId = (int) $assetDef['id'];
+            $DB->delete('glpi_assets_customfielddefinitions', [
+                'assets_assetdefinitions_id' => $assetDefId
+            ]);
+            $DB->delete('glpi_assets_assetdefinitions', ['id' => $assetDefId]);
+        }
+    }
 
     return true;
 }

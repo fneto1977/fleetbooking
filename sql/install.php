@@ -119,7 +119,7 @@ function plugin_fleetbooking_install_db()
     }
 
     // Auto-assign rights to all profiles:
-    // Only Super-Admins have permissions.
+    // Only Super-Admins have permissions (31 = full rights).
     // All other profiles have no rights (0) by default.
     $profilesIterator = $DB->request([
         'SELECT' => ['id'],
@@ -129,10 +129,10 @@ function plugin_fleetbooking_install_db()
         $profileId = (int)$profile['id'];
         if (in_array($profileId, $superAdminIds, true)) {
             $rightsMapping = [
-                'fleetbooking_read'    => 1,
-                'fleetbooking_request' => 1,
-                'fleetbooking_approve' => 1,
-                'fleetbooking_admin'   => 1,
+                'fleetbooking_read'    => 31,
+                'fleetbooking_request' => 31,
+                'fleetbooking_approve' => 31,
+                'fleetbooking_admin'   => 31,
             ];
         } else {
             $rightsMapping = [

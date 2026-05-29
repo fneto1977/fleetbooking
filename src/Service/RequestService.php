@@ -114,20 +114,20 @@ class RequestService
         // iterator will not attempt entity filtering at all.
         // The same pattern is used in CalendarService::getEvents().
         $resQuery = [
-            'FROM' => 'glpi_reservations',
+            'FROM' => \Reservation::getTable(),
             'INNER JOIN' => [
-                'glpi_reservationitems' => [
+                \ReservationItem::getTable() => [
                     'ON' => [
-                        'glpi_reservations' => 'reservationitems_id',
-                        'glpi_reservationitems' => 'id'
+                        \Reservation::getTable() => 'reservationitems_id',
+                        \ReservationItem::getTable() => 'id'
                     ]
                 ]
             ],
             'WHERE' => [
-                'glpi_reservationitems.itemtype' => $itemtype,
-                'glpi_reservationitems.items_id' => $items_id,
-                'glpi_reservations.begin' => ['<', $end],
-                'glpi_reservations.end' => ['>', $start]
+                \ReservationItem::getTable() . '.itemtype' => $itemtype,
+                \ReservationItem::getTable() . '.items_id' => $items_id,
+                \Reservation::getTable() . '.begin' => ['<', $end],
+                \Reservation::getTable() . '.end' => ['>', $start]
             ]
         ];
 
@@ -195,7 +195,7 @@ class RequestService
         global $DB;
         $manager_iter = $DB->request([
             'SELECT' => ['users_id'],
-            'FROM' => 'glpi_groups_users',
+            'FROM' => \Group_User::getTable(),
             'WHERE' => [
                 'groups_id' => $group_id,
                 'is_manager' => 1
@@ -335,7 +335,7 @@ class RequestService
         }
 
         // Priority 2: groups where the user is a delegate/manager in GLPI
-        $delegates = \Group_User::getUserGroups($requesterId, ['glpi_groups_users.is_manager' => 1]);
+        $delegates = \Group_User::getUserGroups($requesterId, [\Group_User::getTable() . '.is_manager' => 1]);
         $delegateIds = array_column($delegates, 'id');
         foreach ($groups as $group) {
             if (in_array($group['id'], $delegateIds, true)) {

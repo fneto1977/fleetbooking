@@ -76,7 +76,7 @@ if (!empty($item_class) && class_exists($item_class)) {
     $definition_id = 0;
     if (class_exists('Glpi\\Asset\\AssetDefinition')) {
         $all_defs = $DB->request([
-            'FROM' => 'glpi_assets_assetdefinitions',
+            'FROM' => \Glpi\Asset\AssetDefinition::getTable(),
             'WHERE' => ['is_active' => 1],
         ]);
         foreach ($all_defs as $def) {
@@ -217,7 +217,7 @@ $buildWeekUrl = function ($year, $weekNumber, $vid, $weekStartDateStr = null) us
 $bookedHours = [];
 if ($cal_items_id > 0 && !empty($config['vehicle_itemtype'])) {
     foreach ($DB->request([
-        'FROM' => 'glpi_plugin_fleetbooking_requests',
+        'FROM' => \GlpiPlugin\Fleetbooking\Request::getTable(),
         'WHERE' => [
             'itemtype' => $config['vehicle_itemtype'],
             'items_id' => $cal_items_id,

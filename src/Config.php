@@ -65,12 +65,12 @@ class Config extends CommonDBTM
 
         global $DB;
 
-        if (!$DB->tableExists('glpi_plugin_fleetbooking_configs')) {
+        if (!$DB->tableExists(self::getTable())) {
             return;
         }
 
         // Ensure default_tickets_entities_id exists
-        if (!$DB->fieldExists('glpi_plugin_fleetbooking_configs', 'default_tickets_entities_id')) {
+        if (!$DB->fieldExists(self::getTable(), 'default_tickets_entities_id')) {
             try {
                 $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD COLUMN `default_tickets_entities_id` int unsigned NOT NULL DEFAULT 0 AFTER `entities_id`");
             } catch (\Exception $e) {
@@ -84,13 +84,13 @@ class Config extends CommonDBTM
         // Ensure the root entity (0) has a configuration row
         $has_root = $DB->request([
             'COUNT' => 'c',
-            'FROM' => 'glpi_plugin_fleetbooking_configs',
+            'FROM' => self::getTable(),
             'WHERE' => ['entities_id' => 0]
         ])->current();
         if (!$has_root || (int) $has_root['c'] === 0) {
             // Find if any other entity configuration row exists to clone properties from
             $existing_configs = $DB->request([
-                'FROM' => 'glpi_plugin_fleetbooking_configs',
+                'FROM' => self::getTable(),
                 'LIMIT' => 1
             ]);
             $clone_from = null;
@@ -106,7 +106,7 @@ class Config extends CommonDBTM
             if (!class_exists($vehicleItemtype)) {
                 $vehicleItemtype = '';
             }
-            $DB->insert('glpi_plugin_fleetbooking_configs', [
+            $DB->insert(self::getTable(), [
                 'entities_id' => 0,
                 'default_tickets_entities_id' => 0,
                 'itilcategories_id' => $clone_from ? ($clone_from['itilcategories_id'] ?? 0) : 0,
@@ -197,9 +197,9 @@ class Config extends CommonDBTM
         $asset_types = [];
 
         // Load custom assets from GLPI 11 Asset Definitions
-        $order_col = $DB->fieldExists('glpi_assets_assetdefinitions', 'label') ? 'label' : 'name';
+        $order_col = $DB->fieldExists(\Glpi\Asset\AssetDefinition::getTable(), 'label') ? 'label' : 'name';
         $asset_defs = $DB->request([
-            'FROM' => 'glpi_assets_assetdefinitions',
+            'FROM' => \Glpi\Asset\AssetDefinition::getTable(),
             'WHERE' => ['is_active' => 1],
             'ORDER' => ["$order_col ASC"],
         ]);
@@ -322,7 +322,7 @@ class Config extends CommonDBTM
 
         // Get requests from the configuration entity with an associated ticket_id
         $requests = $DB->request([
-            'FROM' => 'glpi_plugin_fleetbooking_requests',
+            'FROM' => \GlpiPlugin\Fleetbooking\Request::getTable(),
             'WHERE' => [
                 'entities_id' => $config_entities_id,
                 'tickets_id' => ['>', 0]
@@ -369,7 +369,7 @@ class Config extends CommonDBTM
 
         // Update the requests entity ID in glpi_plugin_fleetbooking_requests
         $DB->update(
-            'glpi_plugin_fleetbooking_requests',
+            \GlpiPlugin\Fleetbooking\Request::getTable(),
             ['entities_id' => $new_tickets_entities_id],
             ['tickets_id' => $active_ticket_ids]
         );

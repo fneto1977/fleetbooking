@@ -65,7 +65,7 @@ if ($items_id > 0 && $itemtype !== '' && class_exists($itemtype)) {
     $allowed_itemtypes = [];
     $type_result = $DB->request([
         'SELECT' => ['vehicle_itemtype'],
-        'FROM' => 'glpi_plugin_fleetbooking_configs',
+        'FROM' => \GlpiPlugin\Fleetbooking\Config::getTable(),
         'WHERE' => ['NOT' => ['vehicle_itemtype' => null]]
     ]);
     foreach ($type_result as $row) {

@@ -55,7 +55,7 @@ class Profile extends CommonGLPI
         $profile_id = $_SESSION['glpiactiveprofile']['id'];
         $iterator = $DB->request([
             'SELECT' => ['name', 'rights'],
-            'FROM' => 'glpi_profilerights',
+            'FROM' => \ProfileRight::getTable(),
             'WHERE' => [
                 'profiles_id' => $profile_id,
                 'OR' => [

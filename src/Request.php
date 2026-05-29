@@ -140,7 +140,7 @@ class Request extends CommonDBTM
 
         $tab[] = [
             'id'        => '4',
-            'table'     => 'glpi_users',
+            'table'     => \User::getTable(),
             'field'     => 'name',
             'linkfield' => 'requester_users_id',
             'name'      => __('Requester'),
@@ -187,7 +187,7 @@ class Request extends CommonDBTM
 
         $tab[] = [
             'id'        => '7',
-            'table'     => 'glpi_tickets',
+            'table'     => \Ticket::getTable(),
             'field'     => 'name',
             'linkfield' => 'tickets_id',
             'name'      => __('Ticket'),

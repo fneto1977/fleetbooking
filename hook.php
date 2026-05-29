@@ -38,7 +38,7 @@ function plugin_fleetbooking_upgrade($old_version)
     if ($res) {
         // Enforce version bump in DB dynamically to avoid GLPI looping the update state
         $DB->updateOrInsert(
-            'glpi_plugins',
+            \Plugin::getTable(),
             ['version' => PLUGIN_FLEETBOOKING_VERSION, 'state' => 1],
             ['directory' => 'fleetbooking']
         );
@@ -70,23 +70,23 @@ function plugin_fleetbooking_uninstall()
     }
 
     // Remove rights
-    $DB->delete('glpi_profilerights', ['name' => ['LIKE', 'fleetbooking%']]);
+    $DB->delete(\ProfileRight::getTable(), ['name' => ['LIKE', 'fleetbooking%']]);
 
     // Clean up custom asset definitions created by plugin (any system_name variant)
     $assetSystemNames = ['veiculofrota', 'VehicleFleet'];
     foreach ($assetSystemNames as $sysName) {
         $assetDef = $DB->request([
             'SELECT' => ['id'],
-            'FROM' => 'glpi_assets_assetdefinitions',
+            'FROM' => \Glpi\Asset\AssetDefinition::getTable(),
             'WHERE' => ['system_name' => $sysName]
         ])->current();
 
         if ($assetDef) {
             $assetDefId = (int) $assetDef['id'];
-            $DB->delete('glpi_assets_customfielddefinitions', [
+            $DB->delete(\Glpi\Asset\CustomFieldDefinition::getTable(), [
                 'assets_assetdefinitions_id' => $assetDefId
             ]);
-            $DB->delete('glpi_assets_assetdefinitions', ['id' => $assetDefId]);
+            $DB->delete(\Glpi\Asset\AssetDefinition::getTable(), ['id' => $assetDefId]);
         }
     }
 

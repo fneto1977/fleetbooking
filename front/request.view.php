@@ -18,7 +18,7 @@ try {
         $isTechnician = false;
         $ticketUserIter = $DB->request([
             'COUNT' => 'c',
-            'FROM' => 'glpi_tickets_users',
+            'FROM' => \Ticket_User::getTable(),
             'WHERE' => [
                 'tickets_id' => $ticketId,
                 'users_id' => Session::getLoginUserID(),

@@ -21,14 +21,30 @@ This plugin allows the management of fleet (vehicle) reservations through an app
 2. Go to **Setup > Plugins**.
 3. Click on **Install** (floppy disk icon) and then **Enable** (check icon).
 
-## Configuration
+## Post-Installation Actions and Configuration
 
-1. Go to **Administration > Entities**.
-2. Select the desired entity and click on the **Fleet Booking Configuration** tab.
-3. Define the **Default ITIL Category** and the **Vehicles ItemType** (e.g., computers, peripherals, or a generic fleet object).
-4. Configure business hours and colors.
-5. In **Tools > Fleet Booking Request > Fleet Group Managers**, map your groups to their respective managers.
-6. In **Tools > Fleet Booking Request > Fleet Holidays**, add holidays to block reservations on those days.
+After installing and enabling the plugin, strictly follow the steps below to ensure it works correctly:
+
+1. **Entity Configuration:**
+   - Go to **Administration > Entities**, select the desired entity, and click on the **Fleet Booking Configuration** tab.
+   - Define the **Default ITIL Category** that reservation tickets will use, and the **Vehicles ItemType** (e.g., computers, or a generic object). This permission/category setup is essential for ticket creation within the entity.
+   - Configure business hours and colors.
+
+2. **Profile Permissions:**
+   - Go to **Administration > Profiles**.
+   - You must grant access and administration permissions for the plugin to the profiles of users who will manage (approve) and request reservations. Check the plugin's corresponding tab within the profile settings.
+
+3. **Group Management:**
+   - Create or edit GLPI user groups in **Administration > Groups**.
+   - Define the **manager** of each group. The plugin uses this information to automatically route the reservation request (ticket) to the correct manager of the requester's group.
+   - In **Tools > Fleet Booking Request > Fleet Group Managers**, you can also configure additional mappings if needed.
+
+4. **Vehicle Registration (Assets):**
+   - Create your vehicles within the asset list of the type selected in step 1 (e.g., Computers or Generic Objects).
+   - **Naming suggestion:** Use the format `<Name>-<Plate>` (e.g., `Civic-ABC1234`) for the asset name to facilitate visual identification during booking.
+
+5. **Holidays (Optional):**
+   - In **Tools > Fleet Booking Request > Fleet Holidays**, add local holidays to block new reservations on those days.
 
 ## Usage
 

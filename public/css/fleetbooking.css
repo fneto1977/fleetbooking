@@ -1,0 +1,572 @@
+/* ===== FleetBooking Design Tokens ===== */
+:root {
+    /* Palette */
+    --fb-primary: #2563eb;
+    --fb-primary-hover: #1d4ed8;
+    --fb-primary-active: #1e40af;
+    --fb-secondary: #64748b;
+
+    /* Backgrounds */
+    --fb-bg: #f8fafc;
+    --fb-bg-white: #ffffff;
+    --fb-bg-hover: #f1f5f9;
+    --fb-bg-stripe: #f9fafb;
+
+    /* Text */
+    --fb-text: #1e293b;
+    --fb-text-muted: #94a3b8;
+    --fb-text-light: #f8fafc;
+
+    /* Borders */
+    --fb-border: #e2e8f0;
+    --fb-border-light: #f1f5f9;
+
+    /* Status Colors */
+    --fb-success: #16a34a;
+    --fb-success-bg: #dcfce7;
+    --fb-success-text: #166534;
+
+    --fb-danger: #dc2626;
+    --fb-danger-bg: #fee2e2;
+    --fb-danger-text: #991b1b;
+
+    --fb-warning: #d97706;
+    --fb-warning-bg: #fef3c7;
+    --fb-warning-text: #92400e;
+
+    --fb-info: #2563eb;
+    --fb-info-bg: #dbeafe;
+    --fb-info-text: #1e40af;
+
+    /* Request Status Colors */
+    --fb-status-pending: #d97706;
+    --fb-status-pending-bg: #fef3c7;
+    --fb-status-approved: #16a34a;
+    --fb-status-approved-bg: #dcfce7;
+    --fb-status-rejected: #dc2626;
+    --fb-status-rejected-bg: #fee2e2;
+    --fb-status-conflict: #991b1b;
+    --fb-status-conflict-bg: #fecaca;
+
+    /* Calendar */
+    --fb-calendar-bg: #ffffff;
+    --fb-calendar-header-bg: #f1f5f9;
+    --fb-calendar-border: #e2e8f0;
+    --fb-calendar-today-bg: #dbeafe;
+    --fb-calendar-event-bg: #dbeafe;
+    --fb-calendar-event-text: #1e40af;
+    --fb-calendar-event-border: #93c5fd;
+    --fb-calendar-past-bg: #f1f5f9;
+
+    /* Buttons */
+    --fb-btn-approve-bg: #16a34a;
+    --fb-btn-approve-hover: #15803d;
+    --fb-btn-approve-active: #166534;
+    --fb-btn-approve-text: #ffffff;
+
+    --fb-btn-reject-bg: #dc2626;
+    --fb-btn-reject-hover: #b91c1c;
+    --fb-btn-reject-active: #991b1b;
+    --fb-btn-reject-text: #ffffff;
+
+    /* Tooltip */
+    --fb-tooltip-bg: #ffffff;
+    --fb-tooltip-border: #e2e8f0;
+    --fb-tooltip-text: #64748b;
+    --fb-tooltip-shadow: rgba(0, 0, 0, 0.1);
+
+    /* Typography */
+    --fb-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --fb-font-size-xs: 0.75rem;
+    --fb-font-size-sm: 0.84rem;
+    --fb-font-size-base: 0.9rem;
+    --fb-font-size-lg: 1rem;
+    --fb-font-size-xl: 1.25rem;
+    --fb-font-size-xxl: 2rem;
+
+    /* Spacing */
+    --fb-spacing-xs: 4px;
+    --fb-spacing-sm: 8px;
+    --fb-spacing-md: 15px;
+    --fb-spacing-lg: 20px;
+    --fb-spacing-xl: 30px;
+
+    /* Shadows */
+    --fb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --fb-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    /* Border Radius */
+    --fb-radius: 8px;
+    --fb-radius-sm: 4px;
+    --fb-radius-lg: 12px;
+}
+
+/* ===== Base Container ===== */
+.fleetbooking-container {
+    padding: var(--fb-spacing-xl);
+    background-color: var(--fb-bg);
+    border-radius: var(--fb-radius);
+    box-shadow: var(--fb-shadow-sm);
+    margin: var(--fb-spacing-lg) auto;
+    max-width: 1200px;
+}
+
+.fleetbooking-container h2 {
+    color: var(--fb-text);
+    margin-bottom: 25px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--fb-primary);
+    padding-bottom: 10px;
+}
+
+.fleetbooking-container .required {
+    color: var(--fb-danger);
+    font-weight: bold;
+}
+
+#fb_validation_msg {
+    margin-top: var(--fb-spacing-md);
+    padding: 10px;
+    border-radius: var(--fb-radius-sm);
+    font-weight: 500;
+}
+
+/* ===== Calendar Styles ===== */
+#fleetbooking-calendar {
+    margin-top: var(--fb-spacing-xl);
+    border: 1px solid var(--fb-border);
+    border-radius: var(--fb-radius);
+    overflow: visible;
+    background: var(--fb-bg-white);
+    box-shadow: var(--fb-shadow-md);
+}
+
+/* ===== Weekly Calendar Table ===== */
+.fb-weekly-calendar {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fb-font-size-sm);
+    /* min-width removed for responsiveness */
+}
+
+.fb-weekly-calendar th,
+.fb-weekly-calendar td {
+    border: 1px solid var(--fb-border);
+    text-align: center;
+    padding: var(--fb-spacing-xs) 3px;
+}
+
+.fb-weekly-calendar tbody tr:hover td {
+    background-color: var(--fb-calendar-event-bg);
+    cursor: pointer;
+}
+
+/* ===== Hour Slot Selection States ===== */
+.fb-hour-slot.fb-selected {
+    background-color: var(--fb-info-bg) !important;
+    border-top: 1px solid var(--fb-primary) !important;
+    border-bottom: 1px solid var(--fb-primary) !important;
+}
+
+.fb-hour-slot.fb-selected-start {
+    background-color: var(--fb-info-bg) !important;
+    border-color: var(--fb-primary) !important;
+    font-weight: bold;
+}
+
+.fb-hour-slot.fb-selected-end {
+    background-color: var(--fb-info-bg) !important;
+    border-color: var(--fb-primary) !important;
+    font-weight: bold;
+}
+
+.fb-weekly-calendar .fb-available:hover {
+    background-color: var(--fb-success-bg) !important;
+    cursor: pointer;
+}
+
+/* ===== Selection Info Panel ===== */
+#fb_selection_info {
+    margin-bottom: var(--fb-spacing-md);
+    padding: 12px;
+    background: var(--fb-info-bg);
+    border-left: 4px solid var(--fb-primary);
+    border-radius: var(--fb-radius-sm);
+}
+
+#fb_selection_details {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* ===== Day Header with Today Indicator ===== */
+.fb-weekly-calendar th.position-relative {
+    position: relative;
+}
+
+.fb-weekly-calendar th.today-indicator {
+    border-top: 3px solid var(--fb-primary) !important;
+}
+
+/* ===== Legend Styles ===== */
+.fleetbooking-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: var(--fb-spacing-md);
+}
+
+.fleetbooking-legend .color-box {
+    padding: var(--fb-spacing-xs) 12px;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+/* ===== fb-alert Styles (renamed from .alert) ===== */
+.fb-alert {
+    padding: 12px 16px;
+    border-radius: var(--fb-radius-sm);
+    margin-bottom: var(--fb-spacing-md);
+}
+
+.fb-alert-warning {
+    background-color: var(--fb-warning-bg);
+    color: var(--fb-warning-text);
+    border: 1px solid var(--fb-warning);
+}
+
+.fb-alert-danger {
+    background-color: var(--fb-danger-bg);
+    color: var(--fb-danger-text);
+    border: 1px solid var(--fb-danger);
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+    .fleetbooking-container {
+        padding: var(--fb-spacing-md);
+    }
+
+    .fb-weekly-calendar {
+        font-size: 0.7em;
+    }
+
+    #fb_selection_info {
+        font-size: 0.9em;
+    }
+}
+
+/* ===== Mobile (phones) ===== */
+@media (max-width: 576px) {
+    .fleetbooking-container {
+        padding: var(--fb-spacing-md);
+    }
+
+    .fb-weekly-calendar td {
+        padding: 2px 1px;
+        font-size: var(--fb-font-size-xs);
+    }
+
+    .fb-weekly-calendar th {
+        font-size: var(--fb-font-size-xs);
+    }
+
+    .fb-btn-approve,
+    .fb-btn-reject {
+        width: 100%;
+        margin-bottom: var(--fb-spacing-sm);
+    }
+
+    .fb-calendar-status-legend {
+        flex-direction: column;
+        gap: var(--fb-spacing-sm);
+    }
+}
+
+/* ===== Tablet Landscape and Small Desktop ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .fb-weekly-calendar td {
+        padding: var(--fb-spacing-xs) 2px;
+        font-size: var(--fb-font-size-sm);
+    }
+}
+
+/* ===== Large Desktop ===== */
+@media (min-width: 1400px) {
+    .fleetbooking-container {
+        max-width: 1400px;
+    }
+}
+
+/* ===== fb-alert Info Variant ===== */
+.fb-alert {
+    padding: var(--fb-spacing-md);
+    border-radius: 6px;
+    margin-bottom: var(--fb-spacing-lg);
+}
+
+.fb-alert-info {
+    background-color: var(--fb-info-bg);
+    color: var(--fb-info-text);
+    border: 1px solid var(--fb-primary);
+}
+
+/* ===== Approval Buttons ===== */
+.fb-btn-approve {
+    background: var(--fb-btn-approve-bg);
+    color: var(--fb-btn-approve-text);
+    border: none;
+    padding: var(--fb-spacing-sm) var(--fb-spacing-lg);
+    border-radius: var(--fb-radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fb-btn-approve:hover {
+    background: var(--fb-btn-approve-hover);
+}
+
+.fb-btn-approve:focus-visible {
+    outline: 2px solid var(--fb-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+.fb-btn-approve:active {
+    background: var(--fb-btn-approve-active);
+}
+
+.fb-btn-approve:disabled {
+    background: var(--fb-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.fb-btn-reject {
+    background: var(--fb-btn-reject-bg);
+    color: var(--fb-btn-reject-text);
+    border: none;
+    padding: var(--fb-spacing-sm) var(--fb-spacing-lg);
+    border-radius: var(--fb-radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fb-btn-reject:hover {
+    background: var(--fb-btn-reject-hover);
+}
+
+.fb-btn-reject:focus-visible {
+    outline: 2px solid var(--fb-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+.fb-btn-reject:active {
+    background: var(--fb-btn-reject-active);
+}
+
+.fb-btn-reject:disabled {
+    background: var(--fb-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ===== Calendar Container ===== */
+.fb-calendar-container {
+    background: var(--fb-bg-white);
+    padding: 25px;
+    border-radius: var(--fb-radius);
+    box-shadow: var(--fb-shadow-sm);
+}
+
+/* ===== Calendar Scroll Wrapper ===== */
+.fb-calendar-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+.fb-calendar-scroll-wrapper::after {
+    content: '';
+    position: sticky;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, var(--fb-bg));
+    pointer-events: none;
+}
+
+/* ===== Current Request/Event Highlight ===== */
+.current-request-event {
+    border: 2px solid var(--fb-text) !important;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.6) !important;
+    font-weight: bold !important;
+}
+
+/* ===== Status Message Classes ===== */
+.fb-msg-info {
+    color: var(--fb-info);
+}
+
+.fb-msg-success {
+    color: var(--fb-success);
+}
+
+.fb-msg-warning {
+    color: var(--fb-warning);
+}
+
+.fb-msg-error {
+    color: var(--fb-danger);
+}
+
+.fb-msg-muted {
+    color: var(--fb-text-muted);
+}
+
+/* ===== Spinner ===== */
+.fb-spinner {
+    display: inline-block;
+    animation: fb-spin 0.8s linear infinite;
+}
+
+@keyframes fb-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== Event Tooltip ===== */
+.fb-event-tooltip {
+    position: absolute;
+    z-index: 9999;
+    background: var(--fb-tooltip-bg);
+    border: 1px solid var(--fb-tooltip-border);
+    border-radius: 6px;
+    padding: 14px;
+    box-shadow: 0 4px 16px var(--fb-tooltip-shadow);
+    font-size: 13px;
+    max-width: 400px;
+    color: var(--fb-tooltip-text);
+}
+
+.fb-event-tooltip-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    color: #666;
+    padding: 0;
+}
+
+.fb-event-tooltip-close:hover {
+    color: var(--fb-text);
+}
+
+.fb-event-tooltip-body {
+    white-space: pre-wrap;
+    max-width: 360px;
+}
+
+/* ===== Status Label Classes ===== */
+.fb-status-pending {
+    color: var(--fb-status-pending);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.fb-status-approved {
+    color: var(--fb-status-approved);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.fb-status-rejected {
+    color: var(--fb-status-rejected);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.fb-status-conflict {
+    color: var(--fb-status-conflict);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* ===== Dark Mode ===== */
+/* Scoped to fleetbooking-container to avoid affecting the entire GLPI page */
+@media (prefers-color-scheme: dark) {
+
+    .fleetbooking-container,
+    #fleetbooking-calendar {
+        --fb-bg: #0f172a;
+        --fb-bg-white: #1e293b;
+        --fb-bg-hover: #334155;
+        --fb-bg-stripe: #1e293b;
+        --fb-text: #e2e8f0;
+        --fb-text-muted: #64748b;
+        --fb-border: #334155;
+        --fb-border-light: #1e293b;
+        --fb-calendar-bg: #1e293b;
+        --fb-calendar-header-bg: #334155;
+        --fb-calendar-border: #475569;
+        --fb-calendar-today-bg: #1e3a5f;
+        --fb-calendar-event-bg: #1e3a5f;
+        --fb-calendar-event-text: #93c5fd;
+        --fb-calendar-event-border: #3b82f6;
+        --fb-calendar-past-bg: #1e293b;
+        --fb-tooltip-bg: #1e293b;
+        --fb-tooltip-border: #475569;
+        --fb-tooltip-text: #cbd5e1;
+        --fb-tooltip-shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    .fleetbooking-container .fb-event-tooltip-close,
+    #fleetbooking-calendar .fb-event-tooltip-close {
+        color: #94a3b8;
+    }
+
+    .fleetbooking-container .fb-event-tooltip-close:hover,
+    #fleetbooking-calendar .fb-event-tooltip-close:hover {
+        color: #f8fafc;
+    }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+    .fleetbooking-container {
+        max-width: 100%;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .fb-btn-approve,
+    .fb-btn-reject,
+    .fb-calendar-nav,
+    .fb-calendar-status-legend button {
+        display: none !important;
+    }
+
+    .fb-weekly-calendar {
+        border: 1px solid #000;
+    }
+
+    .fb-weekly-calendar th,
+    .fb-weekly-calendar td {
+        border-color: #000;
+        color: #000;
+    }
+}

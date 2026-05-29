@@ -1,0 +1,525 @@
+# FleetBooking Plugin - Template for en_GB
+msgid ""
+msgstr ""
+"Project-Id-Version: FleetBooking 1.0.5\n"
+"POT-Creation-Date: 2026-05-23\n"
+"PO-Revision-Date: 2026-05-23\n"
+"Last-Translator: Getsmart\n"
+"Language-Team: English (UK)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+
+# --- Config ---
+msgid "Fleet Booking Configuration"
+msgstr "Fleet Booking Configuration"
+
+msgid "Default Ticket Category"
+msgstr "Default Ticket Category"
+
+msgid "Vehicle ItemType"
+msgstr "Vehicle ItemType"
+
+msgid "Show pending requests on calendar?"
+msgstr "Show pending requests on calendar?"
+
+msgid "Approved Color"
+msgstr "Approved Color"
+
+msgid "Pending Color"
+msgstr "Pending Color"
+
+msgid "Workday Start Time"
+msgstr "Workday Start Time"
+
+msgid "Workday End Time"
+msgstr "Workday End Time"
+
+msgid "Auto-close ticket on decision (SOLVED)"
+msgstr "Auto-close ticket on decision (SOLVED)"
+
+msgid "Default Entity for Tickets"
+msgstr "Default Entity for Tickets"
+
+msgid "Select Entity to Configure"
+msgstr "Select Entity to Configure"
+
+msgid "Warning: Changing this entity will automatically migrate all active or pending booking tickets and requests to the newly selected entity."
+msgstr "Warning: Changing this entity will automatically migrate all active or pending booking tickets and requests to the newly selected entity."
+
+# --- Types ---
+msgid "Fleet Booking"
+msgstr "Fleet Booking"
+
+msgid "Fleet Booking Request"
+msgid_plural "Fleet Booking Requests"
+msgstr[0] "Fleet Booking Request"
+msgstr[1] "Fleet Booking Requests"
+
+msgid "Fleet Approval"
+msgstr "Fleet Approval"
+
+msgid "Fleet Holiday"
+msgid_plural "Fleet Holidays"
+msgstr[0] "Fleet Holiday"
+msgstr[1] "Fleet Holidays"
+
+msgid "Fleet Group Manager"
+msgid_plural "Fleet Group Managers"
+msgstr[0] "Fleet Group Manager"
+msgstr[1] "Fleet Group Managers"
+
+# --- Statuses ---
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Pending"
+
+msgid "Approved"
+msgstr "Approved"
+
+msgid "Rejected"
+msgstr "Rejected"
+
+msgid "Conflict"
+msgstr "Conflict"
+
+msgid "PENDING"
+msgstr "PENDING"
+
+msgid "APPROVED"
+msgstr "APPROVED"
+
+# --- Request Form ---
+msgid "Request Fleet Reservation"
+msgstr "Request Fleet Reservation"
+
+msgid "Select Vehicle"
+msgstr "Select Vehicle"
+
+msgid "Pickup date/time"
+msgstr "Pickup date/time"
+
+msgid "Return date/time"
+msgstr "Return date/time"
+
+msgid "Reason for requesting"
+msgstr "Reason for requesting"
+
+msgid "Please fill all required fields."
+msgstr "Please fill all required fields."
+
+msgid "Fleet booking requested successfully. A ticket has been created."
+msgstr "Fleet booking requested successfully. A ticket has been created."
+
+msgid "Plugin is not correctly configured. Please contact the administrator to set the target Vehicle ItemType."
+msgstr "Plugin is not correctly configured. Please contact the administrator to set the target Vehicle ItemType."
+
+msgid "No active vehicles found for this entity."
+msgstr "No active vehicles found for this entity."
+
+msgid "Invalid vehicle itemtype configured."
+msgstr "Invalid vehicle itemtype configured."
+
+msgid "Please select a vehicle from the dropdown above to view its availability calendar."
+msgstr "Please select a vehicle from the dropdown above to view its availability calendar."
+
+# --- Weekly Calendar ---
+msgid "Weekly Vehicle Availability"
+msgstr "Weekly Vehicle Availability"
+
+msgid "Selection Info"
+msgstr "Selection Info"
+
+msgid "Previous Week"
+msgstr "Previous Week"
+
+msgid "Next Week"
+msgstr "Next Week"
+
+msgid "This Week"
+msgstr "This Week"
+
+msgid "Available - Click to select"
+msgstr "Available - Click to select"
+
+msgid "Booked"
+msgstr "Booked"
+
+msgid "Past hours, not selectable"
+msgstr "Past hours, not selectable"
+
+msgid "Past hours"
+msgstr "Past hours"
+
+msgid "My Reservation (Approved)"
+msgstr "My Reservation (Approved)"
+
+msgid "My Reservation (Pending)"
+msgstr "My Reservation (Pending)"
+
+# --- Day abbreviations (fallback when intl unavailable) ---
+msgid "Mon"
+msgstr "Mon"
+
+msgid "Tue"
+msgstr "Tue"
+
+msgid "Wed"
+msgstr "Wed"
+
+msgid "Thu"
+msgstr "Thu"
+
+msgid "Fri"
+msgstr "Fri"
+
+msgid "Sat"
+msgstr "Sat"
+
+msgid "Sun"
+msgstr "Sun"
+
+# --- Request View / Approval ---
+msgid "Fleet Booking Request Details"
+msgstr "Fleet Booking Request Details"
+
+msgid "Current Status"
+msgstr "Current Status"
+
+msgid "Requester"
+msgstr "Requester"
+
+msgid "Start Date"
+msgstr "Start Date"
+
+msgid "End Date"
+msgstr "End Date"
+
+msgid "Vehicle"
+msgstr "Vehicle"
+
+msgid "Reason"
+msgstr "Reason"
+
+msgid "Decision Comment"
+msgstr "Decision Comment"
+
+msgid "Real Reservation ID"
+msgstr "Real Reservation ID"
+
+msgid "Manager Action"
+msgstr "Manager Action"
+
+msgid "Mandatory Comment"
+msgstr "Mandatory Comment"
+
+msgid "Approve Request"
+msgstr "Approve Request"
+
+msgid "Reject Request"
+msgstr "Reject Request"
+
+msgid "Only the responsible manager can approve or reject this reservation."
+msgstr "Only the responsible manager can approve or reject this reservation."
+
+msgid "No reservation request found for this ticket."
+msgstr "No reservation request found for this ticket."
+
+msgid "Fleet Occupancy Calendar"
+msgstr "Fleet Occupancy Calendar"
+
+msgid "An internal error occurred."
+msgstr "An internal error occurred."
+
+msgid "An internal error occurred while processing the decision."
+msgstr "An internal error occurred while processing the decision."
+
+# --- Approval Messages ---
+msgid "You do not have permission to decide on this reservation."
+msgstr "You do not have permission to decide on this reservation."
+
+msgid "Date conflict detected. The reservation could not be approved."
+msgstr "Date conflict detected. The reservation could not be approved."
+
+msgid "Reservation APPROVED successfully."
+msgstr "Reservation APPROVED successfully."
+
+msgid "Reservation REJECTED."
+msgstr "Reservation REJECTED."
+
+msgid "Reservation request not found."
+msgstr "Reservation request not found."
+
+# --- Profile Rights ---
+msgid "Fleet Booking Rights"
+msgstr "Fleet Booking Rights"
+
+msgid "Read"
+msgstr "Read"
+
+msgid "Create request"
+msgstr "Create request"
+
+msgid "Approve request"
+msgstr "Approve request"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Manager"
+msgstr "Manager"
+
+# --- Dashboard ---
+msgid "Fleet Reservation Dashboard"
+msgstr "Fleet Reservation Dashboard"
+
+msgid "Period"
+msgstr "Period"
+
+msgid "to"
+msgstr "to"
+
+# --- Calendar Events ---
+msgid "👉 [THIS REQUEST] %1$s — %2$s"
+msgstr "👉 [THIS REQUEST] %1$s — %2$s"
+
+msgid "👉 [THIS RESERVATION] %1$s — %2$s"
+msgstr "👉 [THIS RESERVATION] %1$s — %2$s"
+
+msgid "⭐ [My] %1$s — %2$s"
+msgstr "⭐ [My] %1$s — %2$s"
+
+# --- Calendar HTML ---
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Available"
+msgstr "Available"
+
+# --- JS i18n strings ---
+msgid "Validating availability..."
+msgstr "Validating availability..."
+
+msgid "Period available."
+msgstr "Period available."
+
+msgid "Could not validate availability."
+msgstr "Could not validate availability."
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "End"
+
+# --- AJAX / Error ---
+msgid "Internal server error."
+msgstr "Internal server error."
+
+# --- Asset fields ---
+msgid "Initial Mileage"
+msgstr "Initial Mileage"
+
+msgid "License Plate"
+msgstr "License Plate"
+
+# --- Service validation and errors ---
+msgid "Invalid date/time format."
+msgstr "Invalid date/time format."
+
+msgid "End date/time must be greater than start date/time."
+msgstr "End date/time must be greater than start date/time."
+
+msgid "Pickup is allowed only on business days."
+msgstr "Pickup is allowed only on business days."
+
+msgid "Return is allowed only on business days."
+msgstr "Return is allowed only on business days."
+
+msgid "Pickup is allowed only between %1$s and %2$s."
+msgstr "Pickup is allowed only between %1$s and %2$s."
+
+msgid "Return is allowed only between %1$s and %2$s."
+msgstr "Return is allowed only between %1$s and %2$s."
+
+msgid "Pickup is not allowed on holidays."
+msgstr "Pickup is not allowed on holidays."
+
+msgid "Return is not allowed on holidays."
+msgstr "Return is not allowed on holidays."
+
+msgid "Period unavailable or violates rules."
+msgstr "Period unavailable or violates rules."
+
+msgid "Group without manager configured. Please request a GLPI administrator to configure a Manager for your user group."
+msgstr "Group without manager configured. Please request a GLPI administrator to configure a Manager for your user group."
+
+msgid "Error saving request to database."
+msgstr "Error saving request to database."
+
+msgid "Error creating follow-up ticket."
+msgstr "Error creating follow-up ticket."
+
+msgid "User does not belong to any group."
+msgstr "User does not belong to any group."
+
+msgid "Fleet item is not configured to allow reservations in GLPI."
+msgstr "Fleet item is not configured to allow reservations in GLPI."
+
+msgid "Failed to load reservation item ID (%1$s %2$s)"
+msgstr "Failed to load reservation item ID (%1$s %2$s)"
+
+msgid "Invalid date format for start_datetime: %s"
+msgstr "Invalid date format for start_datetime: %s"
+
+msgid "Invalid date format for end_datetime: %s"
+msgstr "Invalid date format for end_datetime: %s"
+
+msgid "Approved via Ticket #%1$s (FleetBooking Plugin). Message: %2$s"
+msgstr "Approved via Ticket #%1$s (FleetBooking Plugin). Message: %2$s"
+
+msgid "Failed to insert reservation into the system."
+msgstr "Failed to insert reservation into the system."
+
+msgid "Vehicle Reservation Request: %1$s<br>Period: %2$s to %3$s<br>Reason: %4$s"
+msgstr "Vehicle Reservation Request: %1$s<br>Period: %2$s to %3$s<br>Reason: %4$s"
+
+msgid "Reservation for %s"
+msgstr "Reservation for %s"
+
+msgid "Rejection comment is mandatory."
+msgstr "Rejection comment is mandatory."
+
+msgid "Auto-approved by system (Requester is Manager)"
+msgstr "Auto-approved by system (Requester is Manager)"
+
+msgid "Request not found."
+msgstr "Request not found."
+
+msgid "This request has already been processed."
+msgstr "This request has already been processed."
+
+msgid "Internal error creating native reservation: "
+msgstr "Internal error creating native reservation: "
+
+msgid "Reservation APPROVED and created successfully. (ID: %s)<br>Comment: %s"
+msgstr "Reservation APPROVED and created successfully. (ID: %s)<br>Comment: %s"
+
+msgid "Reservation REJECTED.<br>Comment: %s"
+msgstr "Reservation REJECTED.<br>Comment: %s"
+
+msgctxt "button"
+msgid "Submit Request"
+msgstr "Submit Request"
+
+# --- Security / Headers ---
+msgid "Sorry. You can't access this file directly"
+msgstr "Sorry. You can't access this file directly"
+
+msgid "Permission denied"
+msgstr "Permission denied"
+
+msgid "Missing parameters"
+msgstr "Missing parameters"
+
+# --- Asset / Item Types ---
+msgid "Created automatically by FleetBooking plugin"
+msgstr "Created automatically by FleetBooking plugin"
+
+msgid "Vehicle-Fleet"
+msgstr "Vehicle-Fleet"
+
+msgid "Computer"
+msgstr "Computer"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "Network Equipment"
+msgstr "Network Equipment"
+
+msgid "Peripheral"
+msgstr "Peripheral"
+
+msgid "Printer"
+msgstr "Printer"
+
+# --- Approval Service Logs ---
+msgid "Decision processing attempt failed: request #%s already processed (current status: %s)."
+msgstr "Decision processing attempt failed: request #%s already processed (current status: %s)."
+
+msgid "Approval attempt failed due to conflict: request #%s, vehicle %s %s, period %s to %s, manager %s."
+msgstr "Approval attempt failed due to conflict: request #%s, vehicle %s %s, period %s to %s, manager %s."
+
+msgid "Error creating native reservation: request #%s, error: %s."
+msgstr "Error creating native reservation: request #%s, error: %s."
+
+msgid "Request #%s APPROVED successfully: vehicle %s %s, period %s to %s, manager %s, reservation #%s."
+msgstr "Request #%s APPROVED successfully: vehicle %s %s, period %s to %s, manager %s, reservation #%s."
+
+msgid "Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: %s."
+msgstr "Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: %s."
+
+msgid "Rollback failed: "
+msgstr "Rollback failed: "
+
+msgid "Decision error: "
+msgstr "Decision error: "
+
+# --- Request Service Logs ---
+msgid "Request creation attempt failed: user %s, vehicle %s %s, period %s to %s. Reason: %s"
+msgstr "Request creation attempt failed: user %s, vehicle %s %s, period %s to %s. Reason: %s"
+
+msgid "Request creation attempt failed: group %s has no manager configured."
+msgstr "Request creation attempt failed: group %s has no manager configured."
+
+msgid "Error saving request to database: user %s, vehicle %s %s, period %s to %s."
+msgstr "Error saving request to database: user %s, vehicle %s %s, period %s to %s."
+
+msgid "Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, manager %s."
+msgstr "Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, manager %s."
+
+msgid "Failed to create ticket for request #%s. Removing orphaned request."
+msgstr "Failed to create ticket for request #%s. Removing orphaned request."
+
+msgid "Auto-approval of request #%s set status to CONFLICT (date conflict)."
+msgstr "Auto-approval of request #%s set status to CONFLICT (date conflict)."
+
+# --- Reservation Service ---
+msgid "RESERVATION EXCEPTION: "
+msgstr "RESERVATION EXCEPTION: "
+
+# --- Error Details ---
+msgid ""
+"Internal error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+"Internal error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+
+msgid ""
+"Calendar error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+"Calendar error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+
+msgid "Schema migration (default_tickets_entities_id) failed: %s. Grant ALTER TABLE privileges to the GLPI database user or apply the column manually."
+msgstr "Schema migration (default_tickets_entities_id) failed: %s. Grant ALTER TABLE privileges to the GLPI database user or apply the column manually."
+
+
+

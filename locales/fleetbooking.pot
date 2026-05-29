@@ -1,0 +1,757 @@
+# FleetBooking Plugin - Translation Template
+# Copyright (C) 2026 Getsmart
+# This file is distributed under the same license as the FleetBooking package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FleetBooking 1.0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-23 21:01-0300\n"
+"PO-Revision-Date: 2026-05-23\n"
+"Last-Translator: Getsmart\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: fleetbooking/ajax/availability.php:7 fleetbooking/ajax/calendar.php:7
+msgid "Permission denied"
+msgstr ""
+
+#: fleetbooking/ajax/availability.php:19
+msgid "Missing parameters"
+msgstr ""
+
+#: fleetbooking/ajax/availability.php:33
+#: fleetbooking/front/request.view.php:127
+#, php-format
+msgid ""
+"Internal error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+
+#: fleetbooking/ajax/availability.php:41 fleetbooking/ajax/calendar.php:59
+msgid "Internal server error."
+msgstr ""
+
+#: fleetbooking/ajax/calendar.php:51
+#, php-format
+msgid ""
+"Calendar error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:84
+#: fleetbooking/front/request.form.php:281
+msgid "Mon"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:85
+#: fleetbooking/front/request.form.php:281
+msgid "Tue"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:86
+#: fleetbooking/front/request.form.php:281
+msgid "Wed"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:87
+#: fleetbooking/front/request.form.php:281
+msgid "Thu"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:88
+#: fleetbooking/front/request.form.php:281
+msgid "Fri"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:89
+#: fleetbooking/front/request.form.php:281
+msgid "Sat"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:90
+#: fleetbooking/front/request.form.php:281
+msgid "Sun"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:101
+msgid "Previous"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:103
+msgid "Next"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:131
+#: fleetbooking/ajax/calendar_html.php:168
+#: fleetbooking/front/request.form.php:330
+#: fleetbooking/front/request.form.php:360
+msgid "Booked"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:134
+#: fleetbooking/ajax/calendar_html.php:167
+#: fleetbooking/front/request.form.php:335
+#: fleetbooking/front/request.form.php:359 fleetbooking/src/Request.php:237
+msgid "Pending"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:137
+msgid "Available"
+msgstr ""
+
+#: fleetbooking/ajax/calendar_html.php:166
+#: fleetbooking/front/request.form.php:358
+msgid "Available - Click to select"
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:37
+msgid "You do not have permission to decide on this reservation."
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:52
+msgid "Date conflict detected. The reservation could not be approved."
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:57
+msgid "Reservation APPROVED successfully."
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:61
+msgid "Reservation REJECTED."
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:64
+msgid "Decision error: "
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:65
+msgid "An internal error occurred while processing the decision."
+msgstr ""
+
+#: fleetbooking/front/approval.form.php:69
+msgid "Reservation request not found."
+msgstr ""
+
+#: fleetbooking/front/config.php:8 fleetbooking/src/Config.php:21
+msgid "Fleet Booking Configuration"
+msgstr ""
+
+#: fleetbooking/front/config.php:19
+msgid "Select Entity to Configure"
+msgstr ""
+
+#: fleetbooking/front/dashboard.php:8 fleetbooking/front/dashboard.php:19
+#: fleetbooking/src/Request.php:84
+msgid "Fleet Reservation Dashboard"
+msgstr ""
+
+#: fleetbooking/front/dashboard.php:58
+msgid "Period"
+msgstr ""
+
+#: fleetbooking/front/dashboard.php:58
+msgid "to"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:16
+msgid "Please fill all required fields."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:25
+msgid "Fleet booking requested successfully. A ticket has been created."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:34
+#: fleetbooking/front/request.form.php:55
+msgid "Request Fleet Reservation"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:50
+msgid ""
+"Plugin is not correctly configured. Please contact the administrator to set "
+"the target Vehicle ItemType."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:66
+msgid "Select Vehicle"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:112
+msgid "No active vehicles found for this entity."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:121
+msgid "Invalid vehicle itemtype configured."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:125
+msgid "Pickup date/time"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:129
+msgid "Return date/time"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:133 fleetbooking/src/Request.php:184
+msgid "Reason for requesting"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:161
+#: fleetbooking/front/request.form.php:250
+msgid "Weekly Vehicle Availability"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:162
+msgid ""
+"Please select a vehicle from the dropdown above to view its availability "
+"calendar."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:246
+msgid "This Week"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:254
+msgid "Previous Week"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:256
+msgid "Next Week"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:261
+msgid "Selection Info"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:321
+#: fleetbooking/front/request.form.php:361
+msgid "My Reservation (Approved)"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:324
+#: fleetbooking/front/request.form.php:362
+msgid "My Reservation (Pending)"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:340
+msgid "Past hours, not selectable"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:363
+msgid "Past hours"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:381
+msgid "Validating availability..."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:382
+msgid "Period available."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:383
+msgid "Could not validate availability."
+msgstr ""
+
+#: fleetbooking/front/request.form.php:384
+msgid "Start"
+msgstr ""
+
+#: fleetbooking/front/request.form.php:385
+msgid "End"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:4
+msgid "Sorry. You can't access this file directly"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:40
+msgid "Fleet Booking Request Details"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:43
+msgid "Current Status"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:56 fleetbooking/src/Request.php:146
+msgid "Requester"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:58 fleetbooking/src/Request.php:129
+msgid "Start Date"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:59 fleetbooking/src/Request.php:137
+msgid "End Date"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:61
+msgid "Reason"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:64
+msgid "Decision Comment"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:66
+msgid "Real Reservation ID"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:80
+msgid "Manager Action"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:81
+msgid "Mandatory Comment"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:85
+msgid "Approve Request"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:86
+msgid "Reject Request"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:91
+msgid "Only the responsible manager can approve or reject this reservation."
+msgstr ""
+
+#: fleetbooking/front/request.view.php:108
+msgid "Fleet Occupancy Calendar"
+msgstr ""
+
+#: fleetbooking/front/request.view.php:121
+msgid "No reservation request found for this ticket."
+msgstr ""
+
+#: fleetbooking/front/request.view.php:135
+msgid "An internal error occurred."
+msgstr ""
+
+#: fleetbooking/setup.php:56 fleetbooking/src/Profile.php:13
+msgid "Fleet Booking"
+msgstr ""
+
+#: fleetbooking/sql/install.php:160
+msgid "Created automatically by FleetBooking plugin"
+msgstr ""
+
+#: fleetbooking/sql/install.php:172 fleetbooking/sql/install.php:174
+msgid "Vehicle-Fleet"
+msgstr ""
+
+#: fleetbooking/sql/install.php:209 fleetbooking/sql/install.php:211
+msgid "Initial Mileage"
+msgstr ""
+
+#: fleetbooking/sql/install.php:245 fleetbooking/sql/install.php:247
+msgid "License Plate"
+msgstr ""
+
+#: fleetbooking/src/Config.php:78
+#, php-format
+msgid ""
+"Schema migration (default_tickets_entities_id) failed: %s. Grant ALTER TABLE "
+"privileges to the GLPI database user or apply the column manually."
+msgstr ""
+
+#: fleetbooking/src/Config.php:184
+msgid "Default Ticket Category"
+msgstr ""
+
+#: fleetbooking/src/Config.php:189
+msgid "Default Entity for Tickets"
+msgstr ""
+
+#: fleetbooking/src/Config.php:192
+msgid ""
+"Warning: Changing this entity will automatically migrate all active or "
+"pending booking tickets and requests to the newly selected entity."
+msgstr ""
+
+#: fleetbooking/src/Config.php:225
+msgid "Computer"
+msgstr ""
+
+#: fleetbooking/src/Config.php:226
+msgid "Phone"
+msgstr ""
+
+#: fleetbooking/src/Config.php:227
+msgid "Network Equipment"
+msgstr ""
+
+#: fleetbooking/src/Config.php:228
+msgid "Peripheral"
+msgstr ""
+
+#: fleetbooking/src/Config.php:229
+msgid "Printer"
+msgstr ""
+
+#: fleetbooking/src/Config.php:234
+msgid "Vehicle ItemType"
+msgstr ""
+
+#: fleetbooking/src/Config.php:242
+msgid "Resolver ticket automaticamente na decisão (SOLVED)"
+msgstr ""
+
+#: fleetbooking/src/Config.php:247
+msgid "Show pending requests on calendar?"
+msgstr ""
+
+#: fleetbooking/src/Config.php:252
+msgid "Approved Color"
+msgstr ""
+
+#: fleetbooking/src/Config.php:256
+msgid "Pending Color"
+msgstr ""
+
+#: fleetbooking/src/Config.php:261
+msgid "Workday Start Time"
+msgstr ""
+
+#: fleetbooking/src/Config.php:265
+msgid "Workday End Time"
+msgstr ""
+
+#: fleetbooking/src/GroupManager.php:18
+msgid "Fleet Group Manager"
+msgid_plural "Fleet Group Managers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: fleetbooking/src/GroupManager.php:26 fleetbooking/src/Holiday.php:26
+#: fleetbooking/src/Request.php:105
+msgid "Characteristics"
+msgstr ""
+
+#: fleetbooking/src/GroupManager.php:32 fleetbooking/src/GroupManager.php:50
+msgid "Group"
+msgstr ""
+
+#: fleetbooking/src/GroupManager.php:39 fleetbooking/src/GroupManager.php:54
+msgid "Manager"
+msgstr ""
+
+#: fleetbooking/src/Holiday.php:18
+msgid "Fleet Holiday"
+msgid_plural "Fleet Holidays"
+msgstr[0] ""
+msgstr[1] ""
+
+#: fleetbooking/src/Holiday.php:32 fleetbooking/src/Holiday.php:51
+msgid "Date"
+msgstr ""
+
+#: fleetbooking/src/Holiday.php:39 fleetbooking/src/Holiday.php:58
+msgid "Description"
+msgstr ""
+
+#: fleetbooking/src/Profile.php:67
+msgid "Read"
+msgstr ""
+
+#: fleetbooking/src/Profile.php:68
+msgid "Create request"
+msgstr ""
+
+#: fleetbooking/src/Profile.php:69
+msgid "Approve request"
+msgstr ""
+
+#: fleetbooking/src/Profile.php:70
+msgid "Admin"
+msgstr ""
+
+#: fleetbooking/src/Profile.php:78
+msgid "Fleet Booking Rights"
+msgstr ""
+
+#: fleetbooking/src/Request.php:29
+msgid "Fleet Booking Request"
+msgid_plural "Fleet Booking Requests"
+msgstr[0] ""
+msgstr[1] ""
+
+#: fleetbooking/src/Request.php:112
+msgid "Entity"
+msgstr ""
+
+#: fleetbooking/src/Request.php:120
+msgid "Status"
+msgstr ""
+
+#: fleetbooking/src/Request.php:163 fleetbooking/src/Request.php:175
+msgid "Vehicle"
+msgstr ""
+
+#: fleetbooking/src/Request.php:193
+msgid "Ticket"
+msgstr ""
+
+#: fleetbooking/src/Request.php:208 fleetbooking/src/Request.php:210
+msgid "Fleet Approval"
+msgstr ""
+
+#: fleetbooking/src/Request.php:238
+msgid "Approved"
+msgstr ""
+
+#: fleetbooking/src/Request.php:239
+msgid "Rejected"
+msgstr ""
+
+#: fleetbooking/src/Request.php:240
+msgid "Conflict"
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:22
+msgid "Rejection comment is mandatory."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:29
+msgid "Auto-approved by system (Requester is Manager)"
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:57
+msgid "Request not found."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:70
+#, php-format
+msgid ""
+"Decision processing attempt failed: request #%s already processed (current "
+"status: %s)."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:74
+msgid "This request has already been processed."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:97
+msgid "Date conflict detected."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:102
+#, php-format
+msgid ""
+"Approval attempt failed due to conflict: request #%s, vehicle %s %s, period "
+"%s to %s, manager %s."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:118
+#, php-format
+msgid "Error creating native reservation: request #%s, error: %s."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:123
+msgid "Internal error creating native reservation: "
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:127
+#, php-format
+msgid ""
+"Request #%s APPROVED successfully: vehicle %s %s, period %s to %s, manager "
+"%s, reservation #%s."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:137
+#, php-format
+msgid "Reservation APPROVED and created successfully. (ID: %s)<br>Comment: %s"
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:140
+#, php-format
+msgid ""
+"Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: "
+"%s."
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:150
+#, php-format
+msgid "Reservation REJECTED.<br>Comment: %s"
+msgstr ""
+
+#: fleetbooking/src/Service/ApprovalService.php:181
+msgid "Rollback failed: "
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:58
+#: fleetbooking/src/Service/CalendarService.php:63
+#: fleetbooking/src/Service/CalendarService.php:68
+#: fleetbooking/src/Service/CalendarService.php:69
+msgid "PENDING"
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:58
+#, php-format
+msgid "👉 [THIS REQUEST] %1$s — %2$s"
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:63
+#, php-format
+msgid "⭐ [My] %1$s — %2$s"
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:157
+#: fleetbooking/src/Service/CalendarService.php:162
+#: fleetbooking/src/Service/CalendarService.php:167
+#: fleetbooking/src/Service/CalendarService.php:168
+msgid "APPROVED"
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:157
+#, php-format
+msgid "👉 [ESTA RESERVA] %1$s — %2$s"
+msgstr ""
+
+#: fleetbooking/src/Service/CalendarService.php:162
+#, php-format
+msgid "⭐ [Minha] %1$s — %2$s"
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:40
+msgid "Invalid date/time format."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:46
+msgid "End date/time must be greater than start date/time."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:65
+msgid "Pickup is allowed only on business days."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:69
+msgid "Return is allowed only on business days."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:74
+#, php-format
+msgid "Pickup is allowed only between %1$s and %2$s."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:78
+#, php-format
+msgid "Return is allowed only between %1$s and %2$s."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:84
+msgid "Pickup is not allowed on holidays."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:88
+msgid "Return is not allowed on holidays."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:166
+#, php-format
+msgid ""
+"Request creation attempt failed: user %s, vehicle %s %s, period %s to %s. "
+"Reason: %s"
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:174
+msgid "Period unavailable or violates rules."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:206
+#, php-format
+msgid "Request creation attempt failed: group %s has no manager configured."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:209
+msgid ""
+"Group without manager configured. Please request a GLPI administrator to "
+"configure a Manager for your user group."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:230
+#, php-format
+msgid ""
+"Error saving request to database: user %s, vehicle %s %s, period %s to %s."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:237
+msgid "Error saving request to database."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:241
+#, php-format
+msgid ""
+"Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, "
+"manager %s."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:259
+#, php-format
+msgid "Failed to create ticket for request #%s. Removing orphaned request."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:263
+msgid "Error creating follow-up ticket."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:274
+#, php-format
+msgid "Auto-approval of request #%s set status to CONFLICT (date conflict)."
+msgstr ""
+
+#: fleetbooking/src/Service/RequestService.php:302
+msgid "User does not belong to any group."
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:23
+msgid "Fleet item is not configured to allow reservations in GLPI."
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:30
+#, php-format
+msgid "Failed to load reservation item ID (%1$s %2$s)"
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:43
+#, php-format
+msgid "Invalid date format for start_datetime: %s"
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:51
+#, php-format
+msgid "Invalid date format for end_datetime: %s"
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:62
+#, php-format
+msgid "Approved via Ticket #%1$s (FleetBooking Plugin). Message: %2$s"
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:69
+msgid "RESERVATION EXCEPTION: "
+msgstr ""
+
+#: fleetbooking/src/Service/ReservationService.php:74
+msgid "Failed to insert reservation into the system."
+msgstr ""
+
+#: fleetbooking/src/Service/TicketService.php:30
+#, php-format
+msgid ""
+"Vehicle Reservation Request: %1$s<br>Period: %2$s to %3$s<br>Reason: %4$s"
+msgstr ""
+
+#: fleetbooking/src/Service/TicketService.php:39
+#, php-format
+msgid "Reservation for %s"
+msgstr ""

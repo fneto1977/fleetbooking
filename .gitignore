@@ -1,0 +1,20 @@
+# Arquivos de sistema do macOS e Windows
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Pastas de IDEs e Editores
+.idea/
+.vscode/
+*.swp
+
+# Dependências (caso use composer no futuro)
+vendor/
+
+# Arquivos de log e temporários
+*.log
+*.tmp

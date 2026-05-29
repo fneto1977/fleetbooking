@@ -1,0 +1,525 @@
+# FleetBooking Plugin - Template for pt_BR
+msgid ""
+msgstr ""
+"Project-Id-Version: FleetBooking 1.0.5\n"
+"POT-Creation-Date: 2026-05-23\n"
+"PO-Revision-Date: 2026-05-23\n"
+"Last-Translator: Getsmart\n"
+"Language-Team: Portuguese (Brazil)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+
+# --- Config ---
+msgid "Fleet Booking Configuration"
+msgstr "Configuração de Reserva de Frota"
+
+msgid "Default Ticket Category"
+msgstr "Categoria de Ticket Padrão"
+
+msgid "Vehicle ItemType"
+msgstr "Tipo de Item de Veículo"
+
+msgid "Show pending requests on calendar?"
+msgstr "Mostrar solicitações pendentes no calendário?"
+
+msgid "Approved Color"
+msgstr "Cor para Aprovado"
+
+msgid "Pending Color"
+msgstr "Cor para Pendente"
+
+msgid "Workday Start Time"
+msgstr "Início do Horário Comercial"
+
+msgid "Workday End Time"
+msgstr "Fim do Horário Comercial"
+
+msgid "Auto-close ticket on decision (SOLVED)"
+msgstr "Resolver ticket automaticamente na decisão (SOLVED)"
+
+msgid "Default Entity for Tickets"
+msgstr "Entidade Padrão para Chamados"
+
+msgid "Select Entity to Configure"
+msgstr "Selecionar Entidade para Configurar"
+
+msgid "Warning: Changing this entity will automatically migrate all active or pending booking tickets and requests to the newly selected entity."
+msgstr "Aviso: A alteração desta entidade migrará automaticamente todos os chamados ativos ou pendentes e solicitações de reserva para a nova entidade selecionada."
+
+# --- Types ---
+msgid "Fleet Booking"
+msgstr "Reserva de Frota"
+
+msgid "Fleet Booking Request"
+msgid_plural "Fleet Booking Requests"
+msgstr[0] "Requisição de Veículo"
+msgstr[1] "Requisições de Veículos"
+
+msgid "Fleet Approval"
+msgstr "Aprovação de Frota"
+
+msgid "Fleet Holiday"
+msgid_plural "Fleet Holidays"
+msgstr[0] "Feriado de Frota"
+msgstr[1] "Feriados de Frota"
+
+msgid "Fleet Group Manager"
+msgid_plural "Fleet Group Managers"
+msgstr[0] "Gestor de Grupo de Frota"
+msgstr[1] "Gestores de Grupo de Frota"
+
+# --- Statuses ---
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Pendente"
+
+msgid "Approved"
+msgstr "Aprovado"
+
+msgid "Rejected"
+msgstr "Rejeitado"
+
+msgid "Conflict"
+msgstr "Conflito"
+
+msgid "PENDING"
+msgstr "PENDENTE"
+
+msgid "APPROVED"
+msgstr "APROVADO"
+
+# --- Request Form ---
+msgid "Request Fleet Reservation"
+msgstr "Solicitar Reserva de Veículo"
+
+msgid "Select Vehicle"
+msgstr "Selecionar Veículo"
+
+msgid "Pickup date/time"
+msgstr "Data/hora de retirada"
+
+msgid "Return date/time"
+msgstr "Data/hora de devolução"
+
+msgid "Reason for requesting"
+msgstr "Motivo da Solicitação"
+
+msgid "Please fill all required fields."
+msgstr "Por favor, preencha todos os campos obrigatórios."
+
+msgid "Fleet booking requested successfully. A ticket has been created."
+msgstr "Reserva de frota solicitada com sucesso. Um chamado foi criado."
+
+msgid "Plugin is not correctly configured. Please contact the administrator to set the target Vehicle ItemType."
+msgstr "Plugin não está configurado corretamente. Contate o administrador para definir o Tipo de Item de Veículo."
+
+msgid "No active vehicles found for this entity."
+msgstr "Nenhum veículo ativo encontrado para esta entidade."
+
+msgid "Invalid vehicle itemtype configured."
+msgstr "Tipo de item de veículo configurado inválido."
+
+msgid "Please select a vehicle from the dropdown above to view its availability calendar."
+msgstr "Por favor, selecione um veículo no dropdown acima para ver o calendário de disponibilidade."
+
+# --- Weekly Calendar ---
+msgid "Weekly Vehicle Availability"
+msgstr "Disponibilidade Semanal do Veículo"
+
+msgid "Selection Info"
+msgstr "Informações da Seleção"
+
+msgid "Previous Week"
+msgstr "Semana Anterior"
+
+msgid "Next Week"
+msgstr "Próxima Semana"
+
+msgid "This Week"
+msgstr "Esta Semana"
+
+msgid "Available - Click to select"
+msgstr "Disponível - Clique para selecionar"
+
+msgid "Booked"
+msgstr "Reservado"
+
+msgid "Past hours, not selectable"
+msgstr "Horário passado, não selecionável"
+
+msgid "Past hours"
+msgstr "Horário passado"
+
+msgid "My Reservation (Approved)"
+msgstr "Minha Reserva (Aprovada)"
+
+msgid "My Reservation (Pending)"
+msgstr "Minha Reserva (Pendente)"
+
+# --- Day abbreviations (fallback when intl unavailable) ---
+msgid "Mon"
+msgstr "Seg"
+
+msgid "Tue"
+msgstr "Ter"
+
+msgid "Wed"
+msgstr "Qua"
+
+msgid "Thu"
+msgstr "Qui"
+
+msgid "Fri"
+msgstr "Sex"
+
+msgid "Sat"
+msgstr "Sáb"
+
+msgid "Sun"
+msgstr "Dom"
+
+# --- Request View / Approval ---
+msgid "Fleet Booking Request Details"
+msgstr "Detalhes da Solicitação de Reserva"
+
+msgid "Current Status"
+msgstr "Status Atual"
+
+msgid "Requester"
+msgstr "Solicitante"
+
+msgid "Start Date"
+msgstr "Data de Início"
+
+msgid "End Date"
+msgstr "Data de Fim"
+
+msgid "Vehicle"
+msgstr "Veículo"
+
+msgid "Reason"
+msgstr "Motivo"
+
+msgid "Decision Comment"
+msgstr "Comentário da Decisão"
+
+msgid "Real Reservation ID"
+msgstr "ID da Reserva Real"
+
+msgid "Manager Action"
+msgstr "Ação do Gestor"
+
+msgid "Mandatory Comment"
+msgstr "Comentário Obrigatório"
+
+msgid "Approve Request"
+msgstr "Aprovar Reserva"
+
+msgid "Reject Request"
+msgstr "Rejeitar Reserva"
+
+msgid "Only the responsible manager can approve or reject this reservation."
+msgstr "Apenas o gestor responsável pode aprovar ou rejeitar esta reserva."
+
+msgid "No reservation request found for this ticket."
+msgstr "Nenhuma solicitação de reserva encontrada para este chamado."
+
+msgid "Fleet Occupancy Calendar"
+msgstr "Calendário de Ocupação da Frota"
+
+msgid "An internal error occurred."
+msgstr "Ocorreu um erro interno."
+
+msgid "An internal error occurred while processing the decision."
+msgstr "Ocorreu um erro interno ao processar a decisão."
+
+# --- Approval Messages ---
+msgid "You do not have permission to decide on this reservation."
+msgstr "Você não tem permissão para decidir sobre esta reserva."
+
+msgid "Date conflict detected. The reservation could not be approved."
+msgstr "Conflito de datas detectado. A reserva não pôde ser aprovada."
+
+msgid "Reservation APPROVED successfully."
+msgstr "Reserva APROVADA com sucesso."
+
+msgid "Reservation REJECTED."
+msgstr "Reserva REJEITADA."
+
+msgid "Reservation request not found."
+msgstr "Solicitação de reserva não encontrada."
+
+# --- Profile Rights ---
+msgid "Fleet Booking Rights"
+msgstr "Permissões de Reserva de Frota"
+
+msgid "Read"
+msgstr "Leitura"
+
+msgid "Create request"
+msgstr "Criar solicitação"
+
+msgid "Approve request"
+msgstr "Aprovar solicitação"
+
+msgid "Admin"
+msgstr "Administrador"
+
+msgid "Manager"
+msgstr "Gestor"
+
+# --- Dashboard ---
+msgid "Fleet Reservation Dashboard"
+msgstr "Painel Geral de Reservas de Frota"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "to"
+msgstr "a"
+
+# --- Calendar Events ---
+msgid "👉 [THIS REQUEST] %1$s — %2$s"
+msgstr "👉 [ESTA SOLICITAÇÃO] %1$s — %2$s"
+
+msgid "👉 [THIS RESERVATION] %1$s — %2$s"
+msgstr "👉 [ESTA RESERVA] %1$s — %2$s"
+
+msgid "⭐ [My] %1$s — %2$s"
+msgstr "⭐ [Minha] %1$s — %2$s"
+
+# --- Calendar HTML ---
+msgid "Previous"
+msgstr "Anterior"
+
+msgid "Next"
+msgstr "Próximo"
+
+msgid "Available"
+msgstr "Disponível"
+
+# --- JS i18n strings ---
+msgid "Validating availability..."
+msgstr "Validando disponibilidade..."
+
+msgid "Period available."
+msgstr "Período disponível."
+
+msgid "Could not validate availability."
+msgstr "Não foi possível validar a disponibilidade."
+
+msgid "Start"
+msgstr "Início"
+
+msgid "End"
+msgstr "Fim"
+
+# --- AJAX / Error ---
+msgid "Internal server error."
+msgstr "Erro interno do servidor."
+
+# --- Asset fields ---
+msgid "Initial Mileage"
+msgstr "Quilometragem Inicial"
+
+msgid "License Plate"
+msgstr "Placa"
+
+# --- Service validation and errors ---
+msgid "Invalid date/time format."
+msgstr "Formato de data/hora inválido."
+
+msgid "End date/time must be greater than start date/time."
+msgstr "Data/hora final deve ser maior que inicial."
+
+msgid "Pickup is allowed only on business days."
+msgstr "Retirada somente em dias úteis."
+
+msgid "Return is allowed only on business days."
+msgstr "Devolução somente em dias úteis."
+
+msgid "Pickup is allowed only between %1$s and %2$s."
+msgstr "Retirada somente entre %1$s e %2$s."
+
+msgid "Return is allowed only between %1$s and %2$s."
+msgstr "Devolução somente entre %1$s e %2$s."
+
+msgid "Pickup is not allowed on holidays."
+msgstr "Retirada não permitida em feriado."
+
+msgid "Return is not allowed on holidays."
+msgstr "Devolução não permitida em feriado."
+
+msgid "Period unavailable or violates rules."
+msgstr "Período indisponível ou fora de regras."
+
+msgid "Group without manager configured. Please request a GLPI administrator to configure a Manager for your user group."
+msgstr "Grupo sem gestor configurado. Por favor, solicite a um administrador do GLPI que configure um Gestor para o grupo do seu usuário."
+
+msgid "Error saving request to database."
+msgstr "Erro ao salvar solicitação no banco."
+
+msgid "Error creating follow-up ticket."
+msgstr "Erro ao criar chamado de acompanhamento."
+
+msgid "User does not belong to any group."
+msgstr "Usuário não pertence a nenhum grupo."
+
+msgid "Fleet item is not configured to allow reservations in GLPI."
+msgstr "Item de frota não está configurado para permitir reservas no GLPI."
+
+msgid "Failed to load reservation item ID (%1$s %2$s)"
+msgstr "Falha ao carregar o ID da reserva do item (%1$s %2$s)"
+
+msgid "Invalid date format for start_datetime: %s"
+msgstr "Formato de data inválido para start_datetime: %s"
+
+msgid "Invalid date format for end_datetime: %s"
+msgstr "Formato de data inválido para end_datetime: %s"
+
+msgid "Approved via Ticket #%1$s (FleetBooking Plugin). Message: %2$s"
+msgstr "Aprovado via chamado #%1$s (Plugin FleetBooking). Mensagem: %2$s"
+
+msgid "Failed to insert reservation into the system."
+msgstr "Falha ao inserir reserva no sistema."
+
+msgid "Vehicle Reservation Request: %1$s<br>Period: %2$s to %3$s<br>Reason: %4$s"
+msgstr "Solicitação de Reserva de Veículo: %1$s<br>Período: %2$s a %3$s<br>Motivo: %4$s"
+
+msgid "Reservation for %s"
+msgstr "Reserva de %s"
+
+msgid "Rejection comment is mandatory."
+msgstr "O comentário para rejeição é obrigatório."
+
+msgid "Auto-approved by system (Requester is Manager)"
+msgstr "Auto-aprovado pelo sistema (Solicitante é Gestor)"
+
+msgid "Request not found."
+msgstr "Solicitação de reserva não encontrada."
+
+msgid "This request has already been processed."
+msgstr "Esta solicitação já foi processada."
+
+msgid "Internal error creating native reservation: "
+msgstr "Erro interno ao criar reserva nativa: "
+
+msgid "Reservation APPROVED and created successfully. (ID: %s)<br>Comment: %s"
+msgstr "Reserva APROVADA e criada com sucesso. (ID: %s)<br>Comentário: %s"
+
+msgid "Reservation REJECTED.<br>Comment: %s"
+msgstr "Reserva REJEITADA.<br>Comentário: %s"
+
+msgctxt "button"
+msgid "Submit Request"
+msgstr "Enviar Solicitação"
+
+# --- Security / Headers ---
+msgid "Sorry. You can't access this file directly"
+msgstr "Desculpe. Você não pode acessar este arquivo diretamente"
+
+msgid "Permission denied"
+msgstr "Permissão negada"
+
+msgid "Missing parameters"
+msgstr "Parâmetros ausentes"
+
+# --- Asset / Item Types ---
+msgid "Created automatically by FleetBooking plugin"
+msgstr "Criado automaticamente pelo plugin FleetBooking"
+
+msgid "Vehicle-Fleet"
+msgstr "Vehicle-Fleet"
+
+msgid "Computer"
+msgstr "Computador"
+
+msgid "Phone"
+msgstr "Telefone"
+
+msgid "Network Equipment"
+msgstr "Equipamento de Rede"
+
+msgid "Peripheral"
+msgstr "Periférico"
+
+msgid "Printer"
+msgstr "Impressora"
+
+# --- Approval Service Logs ---
+msgid "Decision processing attempt failed: request #%s already processed (current status: %s)."
+msgstr "Tentativa de processar decisão falhou: solicitação #%s já foi processada (status atual: %s)."
+
+msgid "Approval attempt failed due to conflict: request #%s, vehicle %s %s, period %s to %s, manager %s."
+msgstr "Tentativa de aprovação falhou por conflito: solicitação #%s, veículo %s %s, período %s a %s, gestor %s."
+
+msgid "Error creating native reservation: request #%s, error: %s."
+msgstr "Erro ao criar reserva nativa: solicitação #%s, erro: %s."
+
+msgid "Request #%s APPROVED successfully: vehicle %s %s, period %s to %s, manager %s, reservation #%s."
+msgstr "Solicitação #%s APROVADA com sucesso: veículo %s %s, período %s a %s, gestor %s, reserva #%s."
+
+msgid "Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: %s."
+msgstr "Solicitação #%s REJEITADA: veículo %s %s, período %s a %s, gestor %s, comentário: %s."
+
+msgid "Rollback failed: "
+msgstr "Falha no rollback: "
+
+msgid "Decision error: "
+msgstr "Erro na decisão: "
+
+# --- Request Service Logs ---
+msgid "Request creation attempt failed: user %s, vehicle %s %s, period %s to %s. Reason: %s"
+msgstr "Tentativa de criação de solicitação falhou: usuário %s, veículo %s %s, período %s a %s. Motivo: %s"
+
+msgid "Request creation attempt failed: group %s has no manager configured."
+msgstr "Tentativa de criação de solicitação falhou: grupo %s não possui gestor configurado."
+
+msgid "Error saving request to database: user %s, vehicle %s %s, period %s to %s."
+msgstr "Erro ao salvar solicitação no banco: usuário %s, veículo %s %s, período %s a %s."
+
+msgid "Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, manager %s."
+msgstr "Solicitação #%s criada com sucesso: usuário %s, veículo %s %s, período %s a %s, gestor %s."
+
+msgid "Failed to create ticket for request #%s. Removing orphaned request."
+msgstr "Falha ao criar ticket para solicitação #%s. Removendo solicitação órfã."
+
+msgid "Auto-approval of request #%s set status to CONFLICT (date conflict)."
+msgstr "Auto-aprovação da solicitação #%s definiu status CONFLICT (conflito de datas)."
+
+# --- Reservation Service ---
+msgid "RESERVATION EXCEPTION: "
+msgstr "EXCEÇÃO NA RESERVA: "
+
+# --- Error Details ---
+msgid ""
+"Internal error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+"Erro interno: %s\n"
+"Arquivo: %s:%d\n"
+"Rastreamento:\n"
+"%s"
+
+msgid ""
+"Calendar error: %s\n"
+"File: %s:%d\n"
+"Trace:\n"
+"%s"
+msgstr ""
+"Erro de calendário: %s\n"
+"Arquivo: %s:%d\n"
+"Rastreamento:\n"
+"%s"
+
+msgid "Schema migration (default_tickets_entities_id) failed: %s. Grant ALTER TABLE privileges to the GLPI database user or apply the column manually."
+msgstr "Migração de schema (default_tickets_entities_id) falhou: %s. Conceda privilégios ALTER TABLE ao usuário do banco GLPI ou aplique a coluna manualmente."
+
+
+

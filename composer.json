@@ -1,0 +1,13 @@
+{
+    "name": "glpi-plugin/fleetbooking",
+    "description": "Plugin para gerenciamento de solicitações e aprovações de reservas de frota no GLPI.",
+    "type": "glpi-plugin",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "GlpiPlugin\\Fleetbooking\\": "src/"
+        }
+    }
+}

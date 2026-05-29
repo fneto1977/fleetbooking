@@ -94,17 +94,62 @@ function plugin_fleetbooking_install_db()
         }
     }
 
-    // Auto-assign full rights to Super-Admin profile (id=4).
-    // rights = READ|UPDATE|CREATE|DELETE|PURGE = 31.
-    // updateOrInsert guarantees this even when addProfileRights() already
-    // created the row with rights=0.
-    $superAdminId = 4;
-    foreach ($all_rights as $right) {
-        $DB->updateOrInsert(
-            'glpi_profilerights',
-            ['rights' => 31],
-            ['profiles_id' => $superAdminId, 'name' => $right]
-        );
+    // Detect Super-Admin profile IDs dynamically using GLPI core methods
+    $superAdminIds = [];
+    if (class_exists('Profile') && method_exists('Profile', 'getSuperAdminProfilesId')) {
+        $superAdminIds = \Profile::getSuperAdminProfilesId();
+    }
+    if (empty($superAdminIds)) {
+        $profilesIt = $DB->request([
+            'SELECT' => ['id'],
+            'FROM'   => 'glpi_profiles',
+            'WHERE'  => [
+                'OR' => [
+                    ['name' => ['LIKE', '%super%']],
+                    ['name' => ['LIKE', '%admin%']]
+                ]
+            ]
+        ]);
+        foreach ($profilesIt as $p) {
+            $superAdminIds[] = (int)$p['id'];
+        }
+    }
+    if (empty($superAdminIds)) {
+        $superAdminIds = [4]; // Fallback to standard GLPI Super-Admin ID
+    }
+
+    // Auto-assign rights to all profiles:
+    // Only Super-Admins have permissions.
+    // All other profiles have no rights (0) by default.
+    $profilesIterator = $DB->request([
+        'SELECT' => ['id'],
+        'FROM'   => 'glpi_profiles'
+    ]);
+    foreach ($profilesIterator as $profile) {
+        $profileId = (int)$profile['id'];
+        if (in_array($profileId, $superAdminIds, true)) {
+            $rightsMapping = [
+                'fleetbooking_read'    => 1,
+                'fleetbooking_request' => 1,
+                'fleetbooking_approve' => 1,
+                'fleetbooking_admin'   => 1,
+            ];
+        } else {
+            $rightsMapping = [
+                'fleetbooking_read'    => 0,
+                'fleetbooking_request' => 0,
+                'fleetbooking_approve' => 0,
+                'fleetbooking_admin'   => 0,
+            ];
+        }
+
+        foreach ($rightsMapping as $rightName => $value) {
+            $DB->updateOrInsert(
+                'glpi_profilerights',
+                ['rights' => $value],
+                ['profiles_id' => $profileId, 'name' => $rightName]
+            );
+        }
     }
 
     plugin_fleetbooking_create_vehicle_asset();
@@ -165,41 +210,99 @@ function plugin_fleetbooking_create_vehicle_asset()
 
     $label = __('Veículo-frota', 'fleetbooking');
 
+    // Detect Super-Admin profile IDs dynamically using GLPI core methods
+    $superAdminIds = [];
+    if (class_exists('Profile') && method_exists('Profile', 'getSuperAdminProfilesId')) {
+        $superAdminIds = \Profile::getSuperAdminProfilesId();
+    }
+    if (empty($superAdminIds)) {
+        $profilesIt = $DB->request([
+            'SELECT' => ['id'],
+            'FROM'   => 'glpi_profiles',
+            'WHERE'  => [
+                'OR' => [
+                    ['name' => ['LIKE', '%super%']],
+                    ['name' => ['LIKE', '%admin%']]
+                ]
+            ]
+        ]);
+        foreach ($profilesIt as $p) {
+            $superAdminIds[] = (int)$p['id'];
+        }
+    }
+    if (empty($superAdminIds)) {
+        $superAdminIds = [4]; // Fallback to standard GLPI Super-Admin ID
+    }
+
+    // Fetch profiles to build default rights for asset_veiculofrota.
+    // Only Super-Admins get full management access.
+    // All other profiles have no access (0) by default.
+    $profilesRights = [];
+    $profilesIterator = $DB->request([
+        'SELECT' => ['id', 'interface'],
+        'FROM'   => 'glpi_profiles'
+    ]);
+    foreach ($profilesIterator as $profile) {
+        $profileId = (int)$profile['id'];
+        if (in_array($profileId, $superAdminIds, true)) {
+            $profilesRights[$profileId] = 3871; // Full rights
+        } else {
+            $profilesRights[$profileId] = 0; // No access
+        }
+    }
+
     $assetDefId = 0;
     if ($existing_row = $existing->current()) {
-        $assetDefId = $existing_row['id'];
+        $assetDefId = (int) $existing_row['id'];
 
-        $DB->update('glpi_assets_assetdefinitions', [
-            'label'         => $label,
-            'icon'          => 'ti-car-garage',
-            'is_active'     => 1,
-            'capacities'    => json_encode($capacities),
+        $updateData = [
+            'label'          => $label,
+            'icon'           => 'ti-car-garage',
+            'is_active'      => 1,
+            'capacities'     => json_encode($capacities),
             'fields_display' => json_encode($fieldsDisplay),
-        ], ['id' => $assetDefId]);
+        ];
+
+        // Overwrite profiles with Super-Admin access only
+        $updateData['profiles'] = json_encode($profilesRights);
+
+        $DB->update('glpi_assets_assetdefinitions', $updateData, ['id' => $assetDefId]);
     } else {
         $DB->insert('glpi_assets_assetdefinitions', [
-            'system_name'   => $system_name,
-            'label'         => $label,
-            'icon'          => 'ti-car-garage',
-            'is_active'     => 1,
-            'comment'       => __('Created automatically by FleetBooking plugin', 'fleetbooking'),
-            'capacities'    => json_encode($capacities),
-            'profiles'      => '[]',
-            'translations'  => '{}',
+            'system_name'    => $system_name,
+            'label'          => $label,
+            'icon'           => 'ti-car-garage',
+            'is_active'      => 1,
+            'comment'        => __('Created automatically by FleetBooking plugin', 'fleetbooking'),
+            'capacities'     => json_encode($capacities),
+            'profiles'       => json_encode($profilesRights),
+            'translations'   => '{}',
             'fields_display' => json_encode($fieldsDisplay),
         ]);
 
-        $assetDefId = (int) $DB->insert_id;
+        $assetDefId = (int) $DB->insertId();
+    }
+
+    // Always sync glpi_profilerights for asset_veiculofrota to ensure access
+    foreach ($profilesRights as $profileId => $rights) {
+        $DB->updateOrInsert(
+            'glpi_profilerights',
+            ['rights' => $rights],
+            ['profiles_id' => $profileId, 'name' => 'asset_veiculofrota']
+        );
     }
 
     if ($assetDefId > 0 && class_exists('Glpi\Asset\CustomFieldDefinition')) {
-        // Remove stale custom fields from previous versions (different system_name)
+        // Remove stale/orphaned custom fields from previous versions or broken attempts
+        $DB->delete('glpi_assets_customfielddefinitions', [
+            'system_name' => ['placa', 'km_inicial', 'initial_mileage', 'license_plate'],
+            'assets_assetdefinitions_id' => ['<>', $assetDefId]
+        ]);
+
+        // Also clean up any legacy fields with old names for current definition ID
         $DB->delete('glpi_assets_customfielddefinitions', [
             'assets_assetdefinitions_id' => $assetDefId,
-            'OR' => [
-                ['system_name' => 'initial_mileage'],
-                ['system_name' => 'license_plate'],
-            ],
+            'system_name' => ['initial_mileage', 'license_plate']
         ]);
 
         // Check if custom field KM Inicial exists

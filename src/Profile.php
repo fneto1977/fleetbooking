@@ -58,12 +58,16 @@ class Profile extends CommonGLPI
             'FROM' => 'glpi_profilerights',
             'WHERE' => [
                 'profiles_id' => $profile_id,
-                'name' => ['LIKE', 'fleetbooking_%']
+                'OR' => [
+                    ['name' => ['LIKE', 'fleetbooking_%']],
+                    ['name' => 'asset_veiculofrota']
+                ]
             ]
         ]);
         foreach ($iterator as $data) {
             $_SESSION['glpiactiveprofile'][$data['name']] = $data['rights'];
         }
+        $_SESSION['glpiactiveprofile']['fleetbooking_rights_loaded'] = true;
     }
 
     public function showForm($profiles_id)

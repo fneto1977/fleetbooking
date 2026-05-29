@@ -38,6 +38,11 @@ function plugin_init_fleetbooking()
         // Session right injection hook
         $PLUGIN_HOOKS['change_profile']['fleetbooking'] = ['GlpiPlugin\Fleetbooking\Profile', 'initProfile'];
 
+        // Auto-load rights into current session if active but not loaded yet (prevents logout/login requirement)
+        if (isset($_SESSION['glpiactiveprofile']['id']) && !isset($_SESSION['glpiactiveprofile']['fleetbooking_rights_loaded'])) {
+            \GlpiPlugin\Fleetbooking\Profile::initProfile();
+        }
+
         // Add to Self-Service Homepage
         $PLUGIN_HOOKS['helpdesk_menu_entry']['fleetbooking'] = '/plugins/fleetbooking/front/request.form.php';
         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['fleetbooking'] = 'ti ti-car';

@@ -44,7 +44,29 @@ class Request extends CommonDBTM
 
     static function canView(): bool
     {
-        return \Session::haveRight(self::$rightname, READ);
+        return \Session::haveRight('fleetbooking_read', READ)
+            || \Session::haveRight(self::$rightname, READ)
+            || \Session::haveRight('fleetbooking_approve', READ)
+            || \Session::haveRight('fleetbooking_admin', READ);
+    }
+
+    /**
+     * Returns the URL used by Search results for item links.
+     * Read-only profiles (Portaria) are routed to the detail-only view
+     * because request.form.php requires fleetbooking_request.
+     */
+    static function getFormURL($full = true)
+    {
+        $isReadOnly = \Session::haveRight('fleetbooking_read', READ)
+            && !\Session::haveRight(self::$rightname, READ)
+            && !\Session::haveRight('fleetbooking_approve', READ)
+            && !\Session::haveRight('fleetbooking_admin', READ);
+
+        $base = $full ? \Plugin::getWebDir('fleetbooking', true) : \Plugin::getWebDir('fleetbooking');
+        if ($isReadOnly) {
+            return $base . '/front/request.readonly.php';
+        }
+        return $base . '/front/request.form.php';
     }
 
     public function isEntityAssign()
@@ -69,16 +91,27 @@ class Request extends CommonDBTM
         $menu['page'] = '/plugins/fleetbooking/front/request.php';
         $menu['icon'] = 'ti ti-car';
         $menu['links']['search'] = '/plugins/fleetbooking/front/request.php';
-        $menu['links']['add'] = '/plugins/fleetbooking/front/request.form.php';
+
+        // Only show the 'add' link if the user can create requests.
+        // Read-only profiles (e.g. portaria) must not be offered the link
+        // because request.form.php requires fleetbooking_request and would
+        // immediately throw a permission error.
+        if (\Session::haveRight(self::$rightname, READ)) {
+            $menu['links']['add'] = '/plugins/fleetbooking/front/request.form.php';
+        }
+
+        $requestLinks = [
+            'search' => '/plugins/fleetbooking/front/request.php',
+        ];
+        if (\Session::haveRight(self::$rightname, READ)) {
+            $requestLinks['add'] = '/plugins/fleetbooking/front/request.form.php';
+        }
 
         $menu['options'] = [
             'request' => [
                 'title' => self::getMenuName(),
                 'page'  => '/plugins/fleetbooking/front/request.php',
-                'links' => [
-                    'search' => '/plugins/fleetbooking/front/request.php',
-                    'add'    => '/plugins/fleetbooking/front/request.form.php'
-                ]
+                'links' => $requestLinks,
             ],
             'dashboard' => [
                 'title' => __('Fleet Reservation Dashboard', 'fleetbooking'),

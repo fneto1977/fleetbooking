@@ -309,6 +309,9 @@ msgstr "Validando disponibilidade..."
 msgid "Period available."
 msgstr "Período disponível."
 
+msgid "This period conflicts with an existing booking (pending or approved). Please choose a different date."
+msgstr "Este período conflita com uma reserva existente (pendente ou aprovada). Por favor, escolha uma data diferente."
+
 msgid "Could not validate availability."
 msgstr "Não foi possível validar a disponibilidade."
 

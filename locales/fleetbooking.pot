@@ -257,6 +257,10 @@ msgstr ""
 msgid "Period available."
 msgstr ""
 
+#: fleetbooking/front/request.form.php:390
+msgid "This period conflicts with an existing booking (pending or approved). Please choose a different date."
+msgstr ""
+
 #: fleetbooking/front/request.form.php:383
 msgid "Could not validate availability."
 msgstr ""

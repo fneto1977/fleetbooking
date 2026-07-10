@@ -378,23 +378,96 @@ echo "</div>"; // End page container
 
 // JS config
 $js_vars = [
-    'ajax_url' => \Plugin::getWebDir('fleetbooking') . '/ajax',
-    'itemtype' => $config['vehicle_itemtype'],
-    'cal_items_id' => $cal_items_id,
-    'week_start_date' => $monday->format('Y-m-d'),
-    'current_week_number' => (int) $monday->format('W'),
-    'current_year' => (int) $monday->format('Y'),
+    'ajax_url'           => \Plugin::getWebDir('fleetbooking') . '/ajax',
+    'itemtype'           => $config['vehicle_itemtype'],
+    'cal_items_id'       => $cal_items_id,
+    'week_start_date'    => $monday->format('Y-m-d'),
+    'current_week_number'=> (int) $monday->format('W'),
+    'current_year'       => (int) $monday->format('Y'),
     'i18n' => [
-        'validating' => __('Validating availability...', 'fleetbooking'),
-        'available' => __('Period available.', 'fleetbooking'),
+        'validating'       => __('Validating availability...', 'fleetbooking'),
+        'available'        => __('Period available.', 'fleetbooking'),
+        'conflict'         => __('This period conflicts with an existing booking (pending or approved). Please choose a different date.', 'fleetbooking'),
         'validation_error' => __('Could not validate availability.', 'fleetbooking'),
-        'start_label' => __('Start', 'fleetbooking'),
-        'end_label' => __('End', 'fleetbooking'),
+        'start_label'      => __('Start', 'fleetbooking'),
+        'end_label'        => __('End', 'fleetbooking'),
     ],
 ];
 echo Html::scriptBlock("var fleetbooking_config = " . json_encode($js_vars) . ";");
 
-// Vehicle re-selection JS — here $cal_items_id is correctly set
+// AJAX availability validation on manual datetime-local field input
+echo Html::scriptBlock("
+(function () {
+    var validationTimer = null;
+    var lastValidationOk = true;
+
+    function validateDateRange() {
+        var start = document.getElementById('fb_start_datetime');
+        var end   = document.getElementById('fb_end_datetime');
+        var msg   = document.getElementById('fb_validation_msg');
+        var btn   = document.getElementById('fb_submit_btn');
+        var itemsId = document.querySelector('[name=\"items_id\"]');
+
+        if (!start || !end || !start.value || !end.value) return;
+
+        var startVal = start.value.replace('T', ' ') + ':00';
+        var endVal   = end.value.replace('T', ' ')   + ':00';
+        var vid      = itemsId ? itemsId.value : fleetbooking_config.cal_items_id;
+
+        if (!vid || vid === '0') return;
+
+        msg.style.color = '#555';
+        msg.textContent = fleetbooking_config.i18n.validating;
+        btn.disabled    = true;
+
+        \$.ajax({
+            url: fleetbooking_config.ajax_url + '/availability.php',
+            type: 'GET',
+            data: {
+                itemtype: fleetbooking_config.itemtype,
+                items_id: vid,
+                start: startVal,
+                end: endVal
+            },
+            success: function (data) {
+                if (data.ok) {
+                    msg.style.color = 'green';
+                    msg.textContent = fleetbooking_config.i18n.available;
+                    btn.disabled    = false;
+                    lastValidationOk = true;
+                } else {
+                    var hasConflict = data.conflicts && data.conflicts.length > 0;
+                    msg.style.color = 'red';
+                    msg.textContent = hasConflict
+                        ? fleetbooking_config.i18n.conflict
+                        : (data.errors ? data.errors.join(' ') : fleetbooking_config.i18n.validation_error);
+                    btn.disabled    = true;
+                    lastValidationOk = false;
+                }
+            },
+            error: function () {
+                msg.style.color = 'orange';
+                msg.textContent = fleetbooking_config.i18n.validation_error;
+                btn.disabled    = false; // let server-side catch it
+                lastValidationOk = true;
+            }
+        });
+    }
+
+    function scheduleValidation() {
+        clearTimeout(validationTimer);
+        validationTimer = setTimeout(validateDateRange, 600);
+    }
+
+    \$(document).ready(function () {
+        \$('#fb_start_datetime, #fb_end_datetime').on('change input', scheduleValidation);
+    });
+})();
+");
+
+// Vehicle re-selection JS — here \$cal_items_id is correctly set
 
 Html::footer();
+
+
 

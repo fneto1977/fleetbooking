@@ -47,12 +47,23 @@ class TicketService
         $ticketId = $ticket->add($ticketInput);
 
         if ($ticketId) {
-            $itemTicket = new Item_Ticket();
+            $itemTicket = new \Item_Ticket();
             $itemTicket->add([
                 'tickets_id' => $ticketId,
-                'itemtype' => $reqInput['itemtype'],
-                'items_id' => $reqInput['items_id']
+                'itemtype'   => $reqInput['itemtype'],
+                'items_id'   => $reqInput['items_id'],
             ]);
+
+            // Add the configured observer group (gatehouse / portaria) to the ticket
+            $observerGroupId = (int) ($config['observer_groups_id'] ?? 0);
+            if ($observerGroupId > 0) {
+                $groupTicket = new \Group_Ticket();
+                $groupTicket->add([
+                    'tickets_id' => $ticketId,
+                    'groups_id'  => $observerGroupId,
+                    'type'       => \CommonITILActor::OBSERVER,
+                ]);
+            }
         }
 
         return $ticketId;

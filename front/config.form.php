@@ -11,6 +11,7 @@ $allowedFields = [
     'entities_id',
     'itilcategories_id',
     'default_tickets_entities_id',
+    'observer_groups_id',
     'vehicle_itemtype',
     'workday_start',
     'workday_end',

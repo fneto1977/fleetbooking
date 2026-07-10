@@ -80,7 +80,7 @@ class ApprovalService
 
             if ($decision === Request::STATUS_APPROVED) {
                 $reqService = new RequestService();
-                $conflicts = $reqService->getConflicts($reqFields['itemtype'], $reqFields['items_id'], $reqFields['start_datetime'], $reqFields['end_datetime']);
+                $conflicts = $reqService->getConflicts($reqFields['itemtype'], $reqFields['items_id'], $reqFields['start_datetime'], $reqFields['end_datetime'], (int) $lockedRequest->getID());
 
                 if (count($conflicts) > 0) {
                     // Persist the CONFLICT status so the audit trail is visible
@@ -90,12 +90,25 @@ class ApprovalService
                     $tz = new \DateTimeZone($_SESSION['glpi_tz'] ?? 'UTC');
                     $decisionDate = (new \DateTime('now', $tz))->format('Y-m-d H:i:s');
                     $lockedRequest->update([
-                        'id' => $lockedRequest->getID(),
-                        'status' => Request::STATUS_CONFLICT,
-                        'decision_users_id' => $userId,
-                        'decision_date' => $decisionDate,
+                        'id'               => $lockedRequest->getID(),
+                        'status'           => Request::STATUS_CONFLICT,
+                        'decision_users_id'=> $userId,
+                        'decision_date'    => $decisionDate,
                         'decision_comment' => __('Date conflict detected.', 'fleetbooking'),
                     ]);
+
+                    // Notify the requester via a public followup so GLPI dispatches
+                    // the standard ticket notification to their e-mail.
+                    $ticketService->addFollowup(
+                        $reqFields['tickets_id'],
+                        __('Your reservation request could not be approved because another booking already exists for the same vehicle and period. Please submit a new request for an available date.', 'fleetbooking'),
+                        0 // public followup
+                    );
+
+                    // Always close the ticket on conflict so the requester is notified
+                    // regardless of the auto_close_ticket_on_decision setting.
+                    $ticketService->closeTicket($reqFields['tickets_id']);
+
                     $DB->commit();
 
                     \Toolbox::logInFile('fleetbooking', sprintf(

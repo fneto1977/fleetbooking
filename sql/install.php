@@ -60,6 +60,7 @@ function plugin_fleetbooking_install_db()
         `id`                            int unsigned  NOT NULL AUTO_INCREMENT,
         `entities_id`                   int unsigned  NOT NULL DEFAULT 0,
         `default_tickets_entities_id`   int unsigned  NOT NULL DEFAULT 0,
+        `observer_groups_id`            int unsigned  NOT NULL DEFAULT 0,
         `itilcategories_id`             int unsigned  DEFAULT NULL,
         `vehicle_itemtype`              varchar(255)  DEFAULT NULL,
         `workday_start`                 time          NOT NULL DEFAULT '07:00:00',
@@ -78,6 +79,9 @@ function plugin_fleetbooking_install_db()
     if ($DB->tableExists('glpi_plugin_fleetbooking_configs')) {
         if (!$DB->fieldExists('glpi_plugin_fleetbooking_configs', 'default_tickets_entities_id')) {
             $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD `default_tickets_entities_id` int unsigned NOT NULL DEFAULT 0 AFTER `entities_id`");
+        }
+        if (!$DB->fieldExists('glpi_plugin_fleetbooking_configs', 'observer_groups_id')) {
+            $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD `observer_groups_id` int unsigned NOT NULL DEFAULT 0 AFTER `default_tickets_entities_id`");
         }
     }
 

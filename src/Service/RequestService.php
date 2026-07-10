@@ -101,12 +101,46 @@ class RequestService
 
     /**
      * Returns array of conflicts for the requested period (checks approved Requests and native Reservations).
+     *
+     * @param string   $itemtype          Vehicle itemtype.
+     * @param int      $items_id          Vehicle ID.
+     * @param string   $start             Start datetime string.
+     * @param string   $end               End datetime string.
+     * @param int|null $excludeRequestId  Plugin request ID to exclude (avoids self-conflict on edits).
      */
-    public function getConflicts(string $itemtype, int $items_id, string $start, string $end): array
+    public function getConflicts(string $itemtype, int $items_id, string $start, string $end, ?int $excludeRequestId = null): array
     {
         global $DB;
         $conflicts = [];
 
+        // --- 1. Check plugin's own pending/approved requests ----------------
+        $pluginWhere = [
+            'itemtype'       => $itemtype,
+            'items_id'       => $items_id,
+            'status'         => [Request::STATUS_PENDING, Request::STATUS_APPROVED],
+            'start_datetime' => ['<', $end],
+            'end_datetime'   => ['>', $start],
+        ];
+        if ($excludeRequestId !== null && $excludeRequestId > 0) {
+            $pluginWhere['NOT'] = ['id' => $excludeRequestId];
+        }
+
+        $pluginIterator = $DB->request([
+            'SELECT' => ['id', 'start_datetime', 'end_datetime', 'status'],
+            'FROM'   => Request::getTable(),
+            'WHERE'  => $pluginWhere,
+        ]);
+        foreach ($pluginIterator as $row) {
+            $conflicts[] = [
+                'source' => 'fleetbooking',
+                'id'     => $row['id'],
+                'start'  => $row['start_datetime'],
+                'end'    => $row['end_datetime'],
+                'status' => $row['status'],
+            ];
+        }
+
+        // --- 2. Check native GLPI Reservations --------------------------------
         // Use glpi_reservations as the FROM table (instead of
         // glpi_reservationitems) to prevent GLPI's DB layer from
         // auto-injecting entities_id on the wrong table.
@@ -127,7 +161,7 @@ class RequestService
                 \ReservationItem::getTable() . '.itemtype' => $itemtype,
                 \ReservationItem::getTable() . '.items_id' => $items_id,
                 \Reservation::getTable() . '.begin' => ['<', $end],
-                \Reservation::getTable() . '.end' => ['>', $start]
+                \Reservation::getTable() . '.end'   => ['>', $start]
             ]
         ];
 
@@ -135,9 +169,9 @@ class RequestService
         foreach ($iterator as $data) {
             $conflicts[] = [
                 'source' => 'reservation',
-                'id' => $data['id'],
-                'start' => $data['begin'],
-                'end' => $data['end'],
+                'id'     => $data['id'],
+                'start'  => $data['begin'],
+                'end'    => $data['end'],
             ];
         }
 

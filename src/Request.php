@@ -126,12 +126,21 @@ class Request extends CommonDBTM
     }
 
     /**
-     * Search options for GLPI lists
+     * Search options for GLPI lists.
+     *
+     * Read-only profiles (only fleetbooking_read) see a restricted set of columns:
+     * status, start date, requester, and vehicle. End date, reason, and ticket
+     * link are intentionally omitted to prevent access to ticket content.
      */
     public function rawSearchOptions()
     {
         global $DB;
         $tab = [];
+
+        $isReadOnly = \Session::haveRight('fleetbooking_read', READ)
+            && !\Session::haveRight(self::$rightname, READ)
+            && !\Session::haveRight('fleetbooking_approve', READ)
+            && !\Session::haveRight('fleetbooking_admin', READ);
 
         $tab[] = [
             'id' => 'common',
@@ -163,69 +172,110 @@ class Request extends CommonDBTM
             'datatype' => 'datetime'
         ];
 
-        $tab[] = [
-            'id' => '3',
-            'table' => $this->getTable(),
-            'field' => 'end_datetime',
-            'name' => __('End Date', 'fleetbooking'),
-            'datatype' => 'datetime'
-        ];
-
-        $tab[] = [
-            'id'        => '4',
-            'table'     => \User::getTable(),
-            'field'     => 'name',
-            'linkfield' => 'requester_users_id',
-            'name'      => __('Requester'),
-            'datatype'  => 'string'
-        ];
-
-        $itemtype = '';
-        if (isset($_SESSION['glpiactive_entity'])) {
-            $config = Config::getForEntity($_SESSION['glpiactive_entity']);
-            $itemtype = $config['vehicle_itemtype'] ?? '';
-        }
-        if (!empty($itemtype) && class_exists($itemtype)) {
-            $vehicle_item = new $itemtype();
-            $vehicle_table = $vehicle_item->getTable();
+        if ($isReadOnly) {
+            // Requester
             $tab[] = [
-                'id'        => '5',
-                'table'     => $vehicle_table,
+                'id'        => '4',
+                'table'     => \User::getTable(),
                 'field'     => 'name',
-                'linkfield' => 'items_id',
-                'name'      => __('Vehicle', 'fleetbooking'),
-                'datatype'  => 'dropdown',
-                'itemtype'  => $itemtype,
-                'joinparams' => [
-                    'condition' => 'AND `' . $this->getTable() . '`.`itemtype` = ' . $DB->quoteValue($itemtype)
-                ]
+                'linkfield' => 'requester_users_id',
+                'name'      => __('Requester'),
+                'datatype'  => 'string'
             ];
+
+            $itemtype = '';
+            if (isset($_SESSION['glpiactive_entity'])) {
+                $config = Config::getForEntity($_SESSION['glpiactive_entity']);
+                $itemtype = $config['vehicle_itemtype'] ?? '';
+            }
+            if (!empty($itemtype) && class_exists($itemtype)) {
+                $vehicle_item  = new $itemtype();
+                $vehicle_table = $vehicle_item->getTable();
+                $tab[] = [
+                    'id'        => '5',
+                    'table'     => $vehicle_table,
+                    'field'     => 'name',
+                    'linkfield' => 'items_id',
+                    'name'      => __('Vehicle', 'fleetbooking'),
+                    'datatype'  => 'string',
+                    'joinparams' => [
+                        'condition' => 'AND `' . $this->getTable() . '`.`itemtype` = ' . $DB->quoteValue($itemtype)
+                    ]
+                ];
+            } else {
+                $tab[] = [
+                    'id' => '5',
+                    'table' => $this->getTable(),
+                    'field' => 'itemtype',
+                    'name' => __('Vehicle', 'fleetbooking'),
+                    'datatype' => 'string'
+                ];
+            }
         } else {
             $tab[] = [
-                'id' => '5',
+                'id' => '3',
                 'table' => $this->getTable(),
-                'field' => 'itemtype',
-                'name' => __('Vehicle', 'fleetbooking'),
-                'datatype' => 'string'
+                'field' => 'end_datetime',
+                'name' => __('End Date', 'fleetbooking'),
+                'datatype' => 'datetime'
+            ];
+
+            $tab[] = [
+                'id'        => '4',
+                'table'     => \User::getTable(),
+                'field'     => 'name',
+                'linkfield' => 'requester_users_id',
+                'name'      => __('Requester'),
+                'datatype'  => 'string'
+            ];
+
+            $itemtype = '';
+            if (isset($_SESSION['glpiactive_entity'])) {
+                $config = Config::getForEntity($_SESSION['glpiactive_entity']);
+                $itemtype = $config['vehicle_itemtype'] ?? '';
+            }
+            if (!empty($itemtype) && class_exists($itemtype)) {
+                $vehicle_item  = new $itemtype();
+                $vehicle_table = $vehicle_item->getTable();
+                $tab[] = [
+                    'id'        => '5',
+                    'table'     => $vehicle_table,
+                    'field'     => 'name',
+                    'linkfield' => 'items_id',
+                    'name'      => __('Vehicle', 'fleetbooking'),
+                    'datatype'  => 'dropdown',
+                    'itemtype'  => $itemtype,
+                    'joinparams' => [
+                        'condition' => 'AND `' . $this->getTable() . '`.`itemtype` = ' . $DB->quoteValue($itemtype)
+                    ]
+                ];
+            } else {
+                $tab[] = [
+                    'id' => '5',
+                    'table' => $this->getTable(),
+                    'field' => 'itemtype',
+                    'name' => __('Vehicle', 'fleetbooking'),
+                    'datatype' => 'string'
+                ];
+            }
+
+            $tab[] = [
+                'id' => '6',
+                'table' => $this->getTable(),
+                'field' => 'reason',
+                'name' => __('Reason for requesting', 'fleetbooking'),
+                'datatype' => 'text'
+            ];
+
+            $tab[] = [
+                'id'        => '7',
+                'table'     => \Ticket::getTable(),
+                'field'     => 'name',
+                'linkfield' => 'tickets_id',
+                'name'      => __('Ticket'),
+                'datatype'  => 'itemlink'
             ];
         }
-
-        $tab[] = [
-            'id' => '6',
-            'table' => $this->getTable(),
-            'field' => 'reason',
-            'name' => __('Reason for requesting', 'fleetbooking'),
-            'datatype' => 'text'
-        ];
-
-        $tab[] = [
-            'id'        => '7',
-            'table'     => \Ticket::getTable(),
-            'field'     => 'name',
-            'linkfield' => 'tickets_id',
-            'name'      => __('Ticket'),
-            'datatype'  => 'itemlink'
-        ];
 
         return $tab;
     }

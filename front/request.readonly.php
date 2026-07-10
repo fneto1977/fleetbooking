@@ -46,10 +46,15 @@ if (!empty($itemtype) && class_exists($itemtype)) {
     }
 }
 
-// Resolve requester name
+// Resolve requester name respecting GLPI display preferences
 $user = new User();
 $user->getFromDB((int) $reqData['requester_users_id']);
-$requesterName = $user->getName();
+$requesterName = formatUserName(
+    $user->getID(),
+    $user->fields['name'] ?? '',
+    $user->fields['realname'] ?? '',
+    $user->fields['firstname'] ?? ''
+);
 
 // Status labels and CSS classes
 $statusLabels = \GlpiPlugin\Fleetbooking\Request::getAllStatuses();
@@ -97,20 +102,6 @@ echo "<tr class='tab_bg_1'>";
 echo "<th>" . __('Return Date', 'fleetbooking') . "</th>";
 echo "<td>" . Html::convDateTime($reqData['end_datetime']) . "</td>";
 echo "</tr>";
-
-// Reason
-echo "<tr class='tab_bg_1'>";
-echo "<th>" . __('Reason for requesting', 'fleetbooking') . "</th>";
-echo "<td>" . nl2br(htmlspecialchars((string) ($reqData['reason'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td>";
-echo "</tr>";
-
-// Decision comment (only when decided)
-if (!empty($reqData['decision_comment']) && $reqData['status'] !== 'pending') {
-    echo "<tr class='tab_bg_1'>";
-    echo "<th>" . __('Decision Comment', 'fleetbooking') . "</th>";
-    echo "<td>" . nl2br(htmlspecialchars((string) $reqData['decision_comment'], ENT_QUOTES, 'UTF-8')) . "</td>";
-    echo "</tr>";
-}
 
 echo "</table>";
 

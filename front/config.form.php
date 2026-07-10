@@ -12,6 +12,7 @@ $allowedFields = [
     'itilcategories_id',
     'default_tickets_entities_id',
     'observer_groups_id',
+    'readonly_profile_id',
     'vehicle_itemtype',
     'workday_start',
     'workday_end',
@@ -33,6 +34,11 @@ if (isset($_POST["update"])) {
     $input = array_intersect_key($_POST, array_flip($addFields));
     $config->add($input);
 }
+
+// Auto-grant vehicle asset READ access to the configured read-only profile
+\GlpiPlugin\Fleetbooking\Config::ensureVehicleAssetReadAccess(
+    (int) ($_POST['readonly_profile_id'] ?? 0)
+);
 
 $entities_id = (int) ($_POST['entities_id'] ?? $_SESSION['glpiactive_entity'] ?? 0);
 $tab = urlencode('GlpiPlugin\Fleetbooking\Config$1');

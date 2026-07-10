@@ -49,7 +49,7 @@ try {
         ];
         $statusClass = $statusClasses[$reqData['status']] ?? '';
         $statusLabel = \GlpiPlugin\Fleetbooking\Request::getAllStatuses()[$reqData['status']] ?? $reqData['status'];
-        echo "<td><strong class='" . htmlspecialchars($statusClass, ENT_QUOTES, 'UTF-8') . "'>" . __($statusLabel, 'fleetbooking') . "</strong></td></tr>";
+        echo "<td><strong class='" . htmlspecialchars($statusClass, ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') . "</strong></td></tr>";
 
         $user = new User();
         $user->getFromDB($reqData['requester_users_id']);

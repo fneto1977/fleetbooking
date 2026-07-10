@@ -61,6 +61,7 @@ function plugin_fleetbooking_install_db()
         `entities_id`                   int unsigned  NOT NULL DEFAULT 0,
         `default_tickets_entities_id`   int unsigned  NOT NULL DEFAULT 0,
         `observer_groups_id`            int unsigned  NOT NULL DEFAULT 0,
+        `readonly_profile_id`           int unsigned  NOT NULL DEFAULT 0,
         `itilcategories_id`             int unsigned  DEFAULT NULL,
         `vehicle_itemtype`              varchar(255)  DEFAULT NULL,
         `workday_start`                 time          NOT NULL DEFAULT '07:00:00',
@@ -82,6 +83,9 @@ function plugin_fleetbooking_install_db()
         }
         if (!$DB->fieldExists('glpi_plugin_fleetbooking_configs', 'observer_groups_id')) {
             $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD `observer_groups_id` int unsigned NOT NULL DEFAULT 0 AFTER `default_tickets_entities_id`");
+        }
+        if (!$DB->fieldExists('glpi_plugin_fleetbooking_configs', 'readonly_profile_id')) {
+            $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD `readonly_profile_id` int unsigned NOT NULL DEFAULT 0 AFTER `observer_groups_id`");
         }
     }
 

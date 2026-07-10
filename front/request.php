@@ -28,103 +28,83 @@ $isReadOnly = \Session::haveRight('fleetbooking_read', READ)
     && !\Session::haveRight('fleetbooking_admin', READ);
 
 if ($isReadOnly) {
-    // ---- Custom HTML listing for read-only profiles (Portaria) ----
-    // The GLPI Search engine silently hides columns when the profile lacks
-    // permissions on the joined tables (e.g. vehicle asset). A custom query
-    // bypasses that limitation entirely.
     global $DB;
 
-    $config   = \GlpiPlugin\Fleetbooking\Config::getForEntity($_SESSION['glpiactive_entity'] ?? 0);
-    $itemtype = $config['vehicle_itemtype'] ?? '';
+    $request = new \GlpiPlugin\Fleetbooking\Request();
 
-    $reqTable = \GlpiPlugin\Fleetbooking\Request::getTable();
-    $userTable = \User::getTable();
-
-    // Build the query with LEFT JOINs so it works even if vehicle class is unavailable.
-    $query = [
-        'SELECT' => [
-            $reqTable . '.id',
-            $reqTable . '.status',
-            $reqTable . '.start_datetime',
-            $reqTable . '.items_id',
-            $userTable . '.name AS requester_name',
-            $userTable . '.realname AS requester_realname',
-            $userTable . '.firstname AS requester_firstname',
+    $rows = $request->find(
+        [
+            'status' => \GlpiPlugin\Fleetbooking\Request::STATUS_APPROVED,
+            'start_datetime' => ['>', date('Y-m-d H:i:s', strtotime('-7 days'))],
         ],
-        'FROM' => $reqTable,
-        'LEFT JOIN' => [
-            $userTable => [
-                'ON' => [
-                    $reqTable  => 'requester_users_id',
-                    $userTable => 'id',
-                ],
-            ],
-        ],
-        'WHERE' => [
-            $reqTable . '.status' => \GlpiPlugin\Fleetbooking\Request::STATUS_APPROVED,
-            $reqTable . '.start_datetime' => ['>', date('Y-m-d H:i:s', strtotime('-7 days'))],
-        ],
-        'ORDER' => $reqTable . '.start_datetime DESC',
-    ];
-
-    // Add vehicle name via LEFT JOIN if itemtype is available.
-    $hasVehicleJoin = false;
-    if (!empty($itemtype) && class_exists($itemtype)) {
-        $vehicleItem  = new $itemtype();
-        $vehicleTable = $vehicleItem->getTable();
-        $query['SELECT'][] = $vehicleTable . '.name AS vehicle_name';
-        $query['LEFT JOIN'][$vehicleTable] = [
-            'ON' => [
-                $reqTable     => 'items_id',
-                $vehicleTable => 'id',
-            ],
-        ];
-        $hasVehicleJoin = true;
-    }
-
-    $iterator = $DB->request($query);
+        'start_datetime DESC',
+        0
+    );
 
     $statusLabels = \GlpiPlugin\Fleetbooking\Request::getAllStatuses();
+    $config = \GlpiPlugin\Fleetbooking\Config::getForEntity($_SESSION['glpiactive_entity'] ?? 0);
+    $itemtype = $config['vehicle_itemtype'] ?? '';
     $baseUrl = \Plugin::getWebDir('fleetbooking') . '/front/request.readonly.php';
+
+    $count = count($rows);
 
     echo "<div class='center' style='margin: 20px;'>";
     echo "<table class='tab_cadre_fixehov'>";
     echo "<thead><tr>";
     echo "<th>" . __('Status', 'fleetbooking') . "</th>";
     echo "<th>" . __('Vehicle', 'fleetbooking') . "</th>";
-    echo "<th>" . __('Requester') . "</th>";
+    echo "<th>" . __('Requester', 'fleetbooking') . "</th>";
     echo "<th>" . __('Pickup Date', 'fleetbooking') . "</th>";
+    echo "<th>" . __('Return Date', 'fleetbooking') . "</th>";
     echo "</tr></thead>";
     echo "<tbody>";
 
-    $count = 0;
-    foreach ($iterator as $row) {
-        $count++;
+    foreach ($rows as $row) {
         $statusLabel = $statusLabels[$row['status']] ?? $row['status'];
 
-        // Build requester display name (realname + firstname or fallback to login)
-        $requesterName = trim(($row['requester_realname'] ?? '') . ' ' . ($row['requester_firstname'] ?? ''));
+        $requesterName = '';
+        $requesterId = (int) ($row['requester_users_id'] ?? 0);
+        if ($requesterId > 0) {
+            $userRow = $DB->request([
+                'SELECT' => ['id', 'name', 'realname', 'firstname'],
+                'FROM'   => \User::getTable(),
+                'WHERE'  => ['id' => $requesterId],
+            ])->current();
+            if ($userRow) {
+                $requesterName = formatUserName(
+                    (int) $userRow['id'],
+                    $userRow['name'] ?? '',
+                    $userRow['realname'] ?? '',
+                    $userRow['firstname'] ?? ''
+                );
+            }
+        }
         if (empty($requesterName)) {
-            $requesterName = $row['requester_name'] ?? '';
+            $requesterName = __('N/A', 'fleetbooking');
         }
 
-        $vehicleName = $hasVehicleJoin
-            ? ($row['vehicle_name'] ?? __('N/A'))
-            : __('N/A');
+        $vehicleName = __('N/A', 'fleetbooking');
+        if (!empty($itemtype) && class_exists($itemtype) && !empty($row['items_id'])) {
+            $vehicleItem = new $itemtype();
+            if ($vehicleItem->getFromDB((int) $row['items_id'])) {
+                $vehicleName = $vehicleItem->fields['name'] ?? __('N/A', 'fleetbooking');
+            }
+        }
 
         $detailUrl = $baseUrl . '?id=' . (int) $row['id'];
 
         echo "<tr class='tab_bg_1'>";
         echo "<td><a href='" . htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8') . "'>"
             . htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8') . "</a></td>";
-        echo "<td>" . htmlspecialchars($vehicleName, ENT_QUOTES, 'UTF-8') . "</td>";
+        echo "<td>" . htmlspecialchars((string) $vehicleName, ENT_QUOTES, 'UTF-8') . "</td>";
         echo "<td>" . htmlspecialchars($requesterName, ENT_QUOTES, 'UTF-8') . "</td>";
         echo "<td>" . Html::convDateTime($row['start_datetime']) . "</td>";
+        echo "<td>" . Html::convDateTime($row['end_datetime']) . "</td>";
         echo "</tr>";
     }
 
     if ($count === 0) {
-        echo "<tr class='tab_bg_1'><td colspan='4' class='center'>"
+        echo "<tr class='tab_bg_1'><td colspan='5' class='center'>"
             . __('No approved reservations found for the last 7 days.', 'fleetbooking')
             . "</td></tr>";
     }

@@ -105,6 +105,18 @@ class Config extends CommonDBTM
             }
         }
 
+        // Ensure reserved_color exists (color for native GLPI reservations on calendar)
+        if (!$DB->fieldExists(self::getTable(), 'reserved_color')) {
+            try {
+                $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD COLUMN `reserved_color` varchar(16) NOT NULL DEFAULT '#8e44ad' AFTER `pending_color`");
+            } catch (\Exception $e) {
+                \Toolbox::logInFile('fleetbooking', sprintf(
+                    __('Schema migration (reserved_color) failed: %s. Grant ALTER TABLE privileges to the GLPI database user or apply the column manually.', 'fleetbooking'),
+                    str_replace(["\n", "\r", "\t"], ' ', $e->getMessage())
+                ));
+            }
+        }
+
         // Ensure the root entity (0) has a configuration row
         $has_root = $DB->request([
             'COUNT' => 'c',
@@ -143,6 +155,7 @@ class Config extends CommonDBTM
                 'show_pending_on_calendar' => $clone_from ? ($clone_from['show_pending_on_calendar'] ?? 1) : 1,
                 'approved_color' => $clone_from ? ($clone_from['approved_color'] ?? '#2ecc71') : '#2ecc71',
                 'pending_color' => $clone_from ? ($clone_from['pending_color'] ?? '#f1c40f') : '#f1c40f',
+                'reserved_color' => $clone_from ? ($clone_from['reserved_color'] ?? '#8e44ad') : '#8e44ad',
             ]);
         }
     }
@@ -190,6 +203,7 @@ class Config extends CommonDBTM
             'show_pending_on_calendar' => 1,
             'approved_color' => '#2ecc71',
             'pending_color' => '#f1c40f',
+            'reserved_color' => '#8e44ad',
         ];
     }
 
@@ -312,11 +326,18 @@ class Config extends CommonDBTM
 
         // Colors
         echo "<tr class='tab_bg_1'><td>" . __('Approved Color', 'fleetbooking') . "</td><td>";
-        echo "<input type='color' name='approved_color' value='" . htmlspecialchars($current['approved_color'], ENT_QUOTES) . "'>";
+        echo "<input type='color' name='approved_color' value='" . htmlspecialchars($current['approved_color'], ENT_QUOTES, 'UTF-8') . "'>";
         echo "</td></tr>";
 
         echo "<tr class='tab_bg_1'><td>" . __('Pending Color', 'fleetbooking') . "</td><td>";
-        echo "<input type='color' name='pending_color' value='" . htmlspecialchars($current['pending_color'], ENT_QUOTES) . "'>";
+        echo "<input type='color' name='pending_color' value='" . htmlspecialchars($current['pending_color'], ENT_QUOTES, 'UTF-8') . "'>";
+        echo "</td></tr>";
+
+        echo "<tr class='tab_bg_1'><td>" . __('Reserved Color', 'fleetbooking') . "</td><td>";
+        echo "<input type='color' name='reserved_color' value='" . htmlspecialchars($current['reserved_color'] ?? '#8e44ad', ENT_QUOTES, 'UTF-8') . "'>";
+        echo "<div style='color:#555; font-size:0.9em; margin-top:4px;'>";
+        echo __('Color used for native GLPI reservations of other users on the calendar.', 'fleetbooking');
+        echo "</div>";
         echo "</td></tr>";
 
         // Workday times

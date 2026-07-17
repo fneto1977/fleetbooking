@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_FLEETBOOKING_VERSION', '1.10.0');
+define('PLUGIN_FLEETBOOKING_VERSION', '1.11.0');
 
 define('PLUGIN_FLEETBOOKING_MIN_GLPI_VERSION', '11.0.0');
 
@@ -66,6 +66,7 @@ function plugin_version_fleetbooking()
         'requirements' => [
             'glpi' => [
                 'min' => PLUGIN_FLEETBOOKING_MIN_GLPI_VERSION,
+                'max' => '12.0.0',
             ]
         ]
     ];

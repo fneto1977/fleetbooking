@@ -118,7 +118,7 @@ if ($isReadOnly) {
 } else {
     // ---- Standard GLPI Search listing for full-access profiles ----
     global $DB;
-    $desiredNums = [1, 5, 4, 2];
+    $desiredNums = [1, 5, 4, 2, 3]; // status, vehicle, requester, start_datetime, end_datetime
 
     $existingRows = iterator_to_array($DB->request([
         'SELECT' => ['num'],
@@ -169,8 +169,158 @@ if ($isReadOnly) {
         $_GET['start']    = 0;
     }
 
+    // Sprint 6 — View All Reservations calendar modal (approvers/admins only)
+    if (
+        Session::haveRight('fleetbooking_approve', READ) ||
+        Session::haveRight('fleetbooking_admin', READ)
+    ) {
+        $config = \GlpiPlugin\Fleetbooking\Config::getForEntity((int)($_SESSION['glpiactive_entity'] ?? 0));
+        $itemtype = $config['vehicle_itemtype'] ?? '';
+
+        $js_vars_admin = [
+            'ajax_url'      => \Plugin::getWebDir('fleetbooking') . '/ajax',
+            'itemtype'      => $itemtype,
+            'fc_url'        => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.global.min.js',
+            'fc_locale_url' => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.pt-br.global.min.js',
+        ];
+
+        $btnLabel = htmlspecialchars(__('View All Reservations', 'fleetbooking'), ENT_QUOTES, 'UTF-8');
+
+        echo "<div style='margin-bottom:16px;'>";
+        echo "<button type='button' id='fb_admin_view_all' class='btn btn-secondary'
+                      style='display:inline-flex;align-items:center;gap:6px;'>
+                <i class='ti ti-calendar-month' aria-hidden='true'></i> {$btnLabel}
+              </button>";
+        echo "</div>";
+
+        // Admin Reservations Modal HTML
+        echo "
+        <div id='fb-admin-reservations-modal'
+             role='dialog'
+             aria-modal='true'
+             aria-labelledby='fb-admin-modal-title'
+             style='display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.5); align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px; font-family:sans-serif;'>
+          <div class='fb-modal-dialog' style='background:#ffffff; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.25); width:90%; max-width:1100px; padding:28px 32px; position:relative; margin:40px auto; min-height:500px;'>
+            <button class='fb-modal-close' id='fb-admin-modal-close' aria-label='" . htmlspecialchars(__('Close', 'fleetbooking'), ENT_QUOTES, 'UTF-8') . "' style='position:absolute; top:16px; right:20px; background:none; border:none; font-size:2rem; cursor:pointer; color:#64748b; line-height:1; padding:0;'>&times;</button>
+            <h3 class='fb-modal-title' id='fb-admin-modal-title' style='font-size:1.3rem; font-weight:600; color:#1e293b; margin-bottom:20px; margin-top:0; padding-right:40px;'>{$btnLabel}</h3>
+            <div id='fb-admin-reservations-calendar' style='min-height:400px;'></div>
+          </div>
+        </div>";
+
+        echo Html::scriptBlock("
+(function () {
+    'use strict';
+    var modal       = document.getElementById('fb-admin-reservations-modal');
+    var openBtn     = document.getElementById('fb_admin_view_all');
+    var closeBtn    = document.getElementById('fb-admin-modal-close');
+    var calDiv      = document.getElementById('fb-admin-reservations-calendar');
+    var calInstance = null;
+    var prevFocus   = null;
+
+    var fb_config_admin = " . json_encode($js_vars_admin) . ";
+
+    function loadScript(src, id, callback) {
+        var script = document.getElementById(id);
+        if (!script) {
+            script = document.createElement('script');
+            script.id = id;
+            script.src = src;
+            script.onload = callback;
+            document.head.appendChild(script);
+        } else {
+            if (script.getAttribute('data-loaded') === 'true' || typeof FullCalendar !== 'undefined') {
+                callback();
+            } else {
+                script.addEventListener('load', callback);
+            }
+        }
+    }
+
+    function openModal() {
+        prevFocus = document.activeElement;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+
+        if (!calInstance) {
+            loadScript(fb_config_admin.fc_url, 'local-fullcalendar-script', function () {
+                if (typeof FullCalendar !== 'undefined' && typeof FullCalendar.globalLocales === 'undefined') {
+                    FullCalendar.globalLocales = [];
+                }
+                loadScript(fb_config_admin.fc_locale_url, 'local-fullcalendar-locale-script', function () {
+                    var script = document.getElementById('local-fullcalendar-locale-script');
+                    if (script) script.setAttribute('data-loaded', 'true');
+                    initCalendar();
+                });
+            });
+        } else {
+            setTimeout(function() {
+                calInstance.updateSize();
+            }, 50);
+        }
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        if (prevFocus) prevFocus.focus();
+    }
+
+    function initCalendar() {
+        var ajaxUrl = fb_config_admin.ajax_url + '/calendar.php'
+            + '?modal_mode=1'
+            + '&itemtype=' + encodeURIComponent(fb_config_admin.itemtype);
+
+        calInstance = new FullCalendar.Calendar(calDiv, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            height: 'auto',
+            headerToolbar: {
+                left:   'prev,next today',
+                center: 'title',
+                right:  'dayGridMonth,listMonth'
+            },
+            events: function (info, successCb, failureCb) {
+                \$.ajax({
+                    url: ajaxUrl,
+                    type: 'GET',
+                    data: {
+                        start: info.startStr,
+                        end:   info.endStr
+                    },
+                    success: successCb,
+                    error:   failureCb
+                });
+            },
+            eventClick: function (info) {
+                if (info.event.url) {
+                    info.jsEvent.preventDefault();
+                    window.open(info.event.url, '_blank', 'noopener,noreferrer');
+                }
+            }
+        });
+        calInstance.render();
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Close on backdrop click
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeModal();
+        }
+    });
+})();
+");
+    }
+
     \Search::show(\GlpiPlugin\Fleetbooking\Request::class);
 }
 
 Html::footer();
-

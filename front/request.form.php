@@ -54,6 +54,14 @@ if (empty($config['vehicle_itemtype'])) {
 
 echo "<h2>" . __('Request Fleet Reservation', 'fleetbooking') . "</h2>";
 
+// Sprint 5 — View All Reservations button
+echo "<div style='margin-bottom:14px;'>";
+echo "<button type='button' id='fb_view_all_reservations' class='btn btn-secondary' style='display:inline-flex;align-items:center;gap:6px;'>";
+echo "<i class='ti ti-calendar-month' aria-hidden='true'></i> ";
+echo htmlspecialchars(__('View All Reservations', 'fleetbooking'), ENT_QUOTES, 'UTF-8');
+echo "</button>";
+echo "</div>";
+
 $action_url = '/plugins/fleetbooking/front/request.form.php';
 echo "<form method='post' action='$action_url' id='fleetbooking-form'>";
 echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
@@ -64,7 +72,7 @@ echo "<input type='hidden' name='itemtype' value='" . htmlspecialchars($config['
 // by GLPI core when it detects required fields in the form. No manual output needed.
 echo "<table class='tab_cadre_fixe'>";
 
-// Vehicle selector
+// Vehicle card grid
 echo "<tr class='tab_bg_1'><td>" . __('Select Vehicle', 'fleetbooking') . " <span class='required'>*</span></td><td>";
 $item_class = $config['vehicle_itemtype'] ?? '';
 
@@ -112,17 +120,58 @@ if (!empty($item_class) && class_exists($item_class)) {
 
     if (empty($vehicles)) {
         echo "<div class='alert alert-warning'>" . __('No active vehicles found for this entity.', 'fleetbooking') . "</div>";
-    }
+    } else {
+        // Hidden input updated by JS when a card is selected
+        echo "<input type='hidden' name='items_id' id='fb_items_id' value='" . (int) $cal_items_id . "'>";
 
-    Dropdown::showFromArray('items_id', $vehicles, [
-        'id' => 'fb_items_id',
-        'value' => $cal_items_id > 0 ? $cal_items_id : 0,
-        'display_emptychoice' => true,
-    ]);
+        echo "<div id='fb-vehicle-grid'
+            role='radiogroup'
+            aria-label='" . htmlspecialchars(__('Select Vehicle', 'fleetbooking'), ENT_QUOTES, 'UTF-8') . "'
+            style='display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin-top:8px;'>";
+
+        foreach ($vehicles as $vid => $vname) {
+            $isSelected  = ($cal_items_id > 0 && (int) $vid === $cal_items_id);
+            $ariaChecked = $isSelected ? 'true' : 'false';
+
+            // Inline styles guarantee card appearance regardless of CSS caching
+            $baseStyle = "display:flex;flex-direction:column;align-items:center;justify-content:center;"
+                . "gap:8px;padding:16px 10px;min-height:90px;text-align:center;"
+                . "border-radius:8px;cursor:pointer;user-select:none;"
+                . "transition:border-color 0.18s,box-shadow 0.18s,background 0.18s;";
+
+            if ($isSelected) {
+                $cardStyle = $baseStyle
+                    . "border:2px solid #2563eb;background:#dbeafe;"
+                    . "box-shadow:0 0 0 3px rgba(37,99,235,0.15);";
+                $iconColor = 'color:#2563eb;';
+            } else {
+                $cardStyle = $baseStyle
+                    . "border:2px solid #e2e8f0;background:#ffffff;";
+                $iconColor = 'color:#64748b;';
+            }
+
+            echo "<div
+                class='fb-vehicle-card" . ($isSelected ? ' fb-vehicle-card--selected' : '') . "'
+                data-vehicle-id='" . (int) $vid . "'
+                role='radio'
+                aria-checked='" . htmlspecialchars($ariaChecked, ENT_QUOTES, 'UTF-8') . "'
+                tabindex='0'
+                title='" . htmlspecialchars($vname, ENT_QUOTES, 'UTF-8') . "'
+                style='" . $cardStyle . "'
+                onmouseover=\"if(!this.classList.contains('fb-vehicle-card--selected')){this.style.borderColor='#2563eb';this.style.background='#f1f5f9';}\"
+                onmouseout=\"if(!this.classList.contains('fb-vehicle-card--selected')){this.style.borderColor='#e2e8f0';this.style.background='#ffffff';}\">
+                <i class='ti ti-car fb-vehicle-card__icon' aria-hidden='true' style='font-size:2rem;" . $iconColor . "'></i>
+                <span class='fb-vehicle-card__name' style='font-size:0.84rem;font-weight:500;color:#1e293b;word-break:break-word;line-height:1.3;'>" . htmlspecialchars($vname, ENT_QUOTES, 'UTF-8') . "</span>
+            </div>";
+        }
+
+        echo "</div>"; // end grid
+    }
 } else {
     echo "<div class='alert alert-warning'>" . __('Invalid vehicle itemtype configured.', 'fleetbooking') . "</div>";
 }
 echo "</td></tr>";
+
 // Date/time pickers (auto-filled by calendar click, editable for cross-week)
 echo "<tr class='tab_bg_1'>";
 echo "<td><label for='fb_start_datetime'>" . __('Pickup date/time', 'fleetbooking') . " <span class='required' aria-hidden='true'>*</span></label></td>";
@@ -164,29 +213,46 @@ $js_vars = [
 if ($cal_items_id === 0) {
     echo "<div id='fleetbooking-calendar' style='margin-top:30px; width:95%; max-width:1200px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:8px;'>";
     echo "<h3>" . __('Weekly Vehicle Availability', 'fleetbooking') . "</h3>";
-    echo "<div class='alert alert-info'>" . __('Please select a vehicle from the dropdown above to view its availability calendar.', 'fleetbooking') . "</div>";
+    echo "<div class='alert alert-info'>" . __('Please select a vehicle from the list above to view its availability calendar.', 'fleetbooking') . "</div>";
     echo "</div>";
     echo "</div>"; // End page container
     echo Html::scriptBlock("var fleetbooking_config = " . json_encode($js_vars) . ";");
-    // Vehicle selection JS — cal_items_id is 0, only redirect logic needed
-    echo Html::scriptBlock("
+}
+
+// Card selection JS — always injected (works for both cal_items_id=0 and cal_items_id>0)
+echo Html::scriptBlock("
 (function(){
     function buildUrl(vid){
-        return '/plugins/fleetbooking/front/request.form.php?cal_items_id='+encodeURIComponent(vid);
+        return window.location.pathname + '?cal_items_id=' + encodeURIComponent(vid);
     }
-    \$(document).ready(function(){
-        \$(document).on('change select2:select','select[name=\"items_id\"]',function(){
-            var vid=\$(this).val();
-            if(!vid||vid==='0') return;
-            window.location.href=buildUrl(vid);
+    function attachCardHandlers() {
+        var grid = document.getElementById('fb-vehicle-grid');
+        if (!grid) return;
+        grid.querySelectorAll('.fb-vehicle-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function() {
+                var vid = parseInt(card.getAttribute('data-vehicle-id'), 10);
+                if (vid > 0) window.location.href = buildUrl(vid);
+            });
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    var vid = parseInt(card.getAttribute('data-vehicle-id'), 10);
+                    if (vid > 0) window.location.href = buildUrl(vid);
+                }
+            });
         });
-        setTimeout(function(){
-            var vid=\$('select[name=\"items_id\"]').val();
-            if(vid&&vid!=='0') window.location.href=buildUrl(vid);
-        },900);
-    });
+    }
+    // Run immediately (elements already in DOM) and also on DOMContentLoaded as fallback
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachCardHandlers);
+    } else {
+        attachCardHandlers();
+    }
 })();
 ");
+
+if ($cal_items_id === 0) {
     Html::footer();
     exit;
 }
@@ -239,8 +305,13 @@ if ($cal_items_id > 0 && !empty($config['vehicle_itemtype'])) {
 }
 
 $workStart = (int) ($config['workday_start'] ?? 7);
-$workEnd = (int) ($config['workday_end'] ?? 19);
-$hours = range($workStart, $workEnd - 1); // dynamic work hours from config
+$workEnd   = (int) ($config['workday_end'] ?? 19);
+$hours     = range($workStart, $workEnd - 1); // dynamic work hours from config
+
+// Dynamic calendar colors from config (Sprint 3)
+$calApprovedColor = $config['approved_color'] ?? '#2ecc71';
+$calPendingColor  = $config['pending_color']  ?? '#f1c40f';
+$calReservedColor = $config['reserved_color'] ?? '#8e44ad';
 $current_year = (int) $monday->format('Y');
 $current_week_number = (int) $monday->format('W');
 $week_end_date = (clone $monday)->modify('+6 days')->format('d/m/Y');
@@ -313,60 +384,61 @@ foreach ($hours as $h) {
         $dateStr2 = $d->format('Y-m-d');
         $isPast2 = ($dateStr2 < $todayStr) || ($dateStr2 === $todayStr && $h < (int) date('H'));
 
-        $hData = $bookedHours[$dateKey] ?? null;
-        $hStatus = $hData['status'] ?? '';
+        $hData     = $bookedHours[$dateKey] ?? null;
+        $hStatus    = $hData['status'] ?? '';
         $hRequester = $hData['requester_users_id'] ?? 0;
         $isMyBooking = ($hStatus !== '' && $hRequester === (int) Session::getLoginUserID());
 
         $cellContent = '&nbsp;';
+        $cellBg = '';
         if ($isMyBooking) {
             $cellContent = '⭐';
             $cur = 'default';
             $cls = '';
             if ($hStatus === 'approved') {
-                $bg = '#b8daff';
+                $cellBg  = $calApprovedColor;   // ← uses config color
                 $tooltip = __('My Reservation (Approved)', 'fleetbooking');
             } else {
-                $bg = '#d1ecf1';
+                $cellBg  = $calPendingColor;    // ← uses config color
                 $tooltip = __('My Reservation (Pending)', 'fleetbooking');
             }
         } elseif ($hStatus === 'approved') {
-            $bg = '#f8d7da';
-            $cur = 'default';
-            $cls = '';
+            $cellBg  = $calReservedColor;       // ← reserved color for others
+            $cur     = 'default';
+            $cls     = '';
             $tooltip = __('Booked', 'fleetbooking');
         } elseif ($hStatus === 'pending') {
-            $bg = '#fff3cd';
-            $cur = 'default';
-            $cls = '';
+            $cellBg  = $calPendingColor;        // ← uses config pending color
+            $cur     = 'default';
+            $cls     = '';
             $tooltip = __('Pending', 'fleetbooking');
         } elseif ($isPast2) {
-            $bg = '#f0f0f0';
-            $cur = 'default';
-            $cls = '';
+            $cellBg  = '#f0f0f0';
+            $cur     = 'default';
+            $cls     = '';
             $tooltip = __('Past hours, not selectable', 'fleetbooking');
         } else {
-            $bg = '#d4edda';
-            $cur = 'pointer';
+            $cellBg  = '#d4edda';
+            $cur     = 'pointer';
             $startDt = $dateStr2 . ' ' . sprintf('%02d', $h) . ':00:00';
-            $endDt = $dateStr2 . ' ' . sprintf('%02d', ($h + 1)) . ':00:00';
-            $cls = "class='fb-hour-slot fb-available' data-start='" . htmlspecialchars($startDt, ENT_QUOTES, 'UTF-8') . "' data-end='" . htmlspecialchars($endDt, ENT_QUOTES, 'UTF-8') . "'";
+            $endDt   = $dateStr2 . ' ' . sprintf('%02d', ($h + 1)) . ':00:00';
+            $cls     = "class='fb-hour-slot fb-available' data-start='" . htmlspecialchars($startDt, ENT_QUOTES, 'UTF-8') . "' data-end='" . htmlspecialchars($endDt, ENT_QUOTES, 'UTF-8') . "'";
             $tooltip = $dateStr2 . ' - ' . sprintf('%02d:00', $h);
         }
 
-        echo "<td $cls style='text-align:center;padding:4px 2px;background:$bg;border:1px solid #ddd;cursor:$cur;' title='" . htmlspecialchars($tooltip, ENT_QUOTES, 'UTF-8') . "'>$cellContent</td>";
+        echo "<td $cls style='text-align:center;padding:4px 2px;background:$cellBg;border:1px solid #ddd;cursor:$cur;' title='" . htmlspecialchars($tooltip, ENT_QUOTES, 'UTF-8') . "'>$cellContent</td>";
     }
     echo "</tr>";
 }
 echo "</tbody></table></div>";
 
-// Legend — below the grid
+// Legend — below the grid (dynamic colors from config)
 echo "<div style='margin-top:14px;font-size:0.84em;display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:6px;'>";
 echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#d4edda;border-radius:3px;'></span>" . __('Available - Click to select', 'fleetbooking') . "</span>";
-echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#fff3cd;border-radius:3px;'></span>" . __('Pending', 'fleetbooking') . "</span>";
-echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#f8d7da;border-radius:3px;'></span>" . __('Booked', 'fleetbooking') . "</span>";
-echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#b8daff;border:1px solid #004085;border-radius:3px;text-align:center;font-size:10px;line-height:14px;'>⭐</span>" . __('My Reservation (Approved)', 'fleetbooking') . "</span>";
-echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#d1ecf1;border:1px solid #0c5460;border-radius:3px;text-align:center;font-size:10px;line-height:14px;'>⭐</span>" . __('My Reservation (Pending)', 'fleetbooking') . "</span>";
+echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:" . htmlspecialchars($calPendingColor, ENT_QUOTES, 'UTF-8') . ";border-radius:3px;'></span>" . __('Pending', 'fleetbooking') . "</span>";
+echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:" . htmlspecialchars($calReservedColor, ENT_QUOTES, 'UTF-8') . ";border-radius:3px;'></span>" . __('Booked', 'fleetbooking') . "</span>";
+echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:" . htmlspecialchars($calApprovedColor, ENT_QUOTES, 'UTF-8') . ";border-radius:3px;text-align:center;font-size:10px;line-height:14px;'>⭐</span>" . __('My Reservation (Approved)', 'fleetbooking') . "</span>";
+echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:" . htmlspecialchars($calPendingColor, ENT_QUOTES, 'UTF-8') . ";border-radius:3px;text-align:center;font-size:10px;line-height:14px;'>⭐</span>" . __('My Reservation (Pending)', 'fleetbooking') . "</span>";
 echo "<span style='display:inline-flex;align-items:center;gap:6px;'><span style='display:inline-block;width:18px;height:14px;background:#f0f0f0;border-radius:3px;'></span>" . __('Past hours', 'fleetbooking') . "</span>";
 echo "</div>";
 
@@ -384,6 +456,8 @@ $js_vars = [
     'week_start_date'    => $monday->format('Y-m-d'),
     'current_week_number'=> (int) $monday->format('W'),
     'current_year'       => (int) $monday->format('Y'),
+    'fc_url'             => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.global.min.js',
+    'fc_locale_url'      => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.pt-br.global.min.js',
     'i18n' => [
         'validating'       => __('Validating availability...', 'fleetbooking'),
         'available'        => __('Period available.', 'fleetbooking'),
@@ -468,9 +542,132 @@ echo Html::scriptBlock("
 })();
 ");
 
-// Vehicle re-selection JS — here \$cal_items_id is correctly set
+// Vehicle re-selection JS — here $cal_items_id is correctly set
+
+// Sprint 5 — All Reservations Modal HTML
+echo "
+<div id='fb-all-reservations-modal'
+     role='dialog'
+     aria-modal='true'
+     aria-labelledby='fb-modal-title'
+     style='display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.5); align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px; font-family:sans-serif;'>
+  <div class='fb-modal-dialog' style='background:#ffffff; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.25); width:90%; max-width:1100px; padding:28px 32px; position:relative; margin:40px auto; min-height:500px;'>
+    <button class='fb-modal-close' id='fb-modal-close' aria-label='" . htmlspecialchars(__('Close', 'fleetbooking'), ENT_QUOTES, 'UTF-8') . "' style='position:absolute; top:16px; right:20px; background:none; border:none; font-size:2rem; cursor:pointer; color:#64748b; line-height:1; padding:0;'>&times;</button>
+    <h3 class='fb-modal-title' id='fb-modal-title' style='font-size:1.3rem; font-weight:600; color:#1e293b; margin-bottom:20px; margin-top:0; padding-right:40px;'>" . htmlspecialchars(__('All Reservations Calendar', 'fleetbooking'), ENT_QUOTES, 'UTF-8') . "</h3>
+    <div id='fb-all-reservations-calendar' style='min-height:400px;'></div>
+  </div>
+</div>";
+
+// Sprint 5 — Modal JS + Lazy FullCalendar init
+echo Html::scriptBlock("
+(function () {
+    'use strict';
+    var modal       = document.getElementById('fb-all-reservations-modal');
+    var openBtn     = document.getElementById('fb_view_all_reservations');
+    var closeBtn    = document.getElementById('fb-modal-close');
+    var calDiv      = document.getElementById('fb-all-reservations-calendar');
+    var calInstance = null;
+    var prevFocus   = null;
+
+    function loadScript(src, id, callback) {
+        var script = document.getElementById(id);
+        if (!script) {
+            script = document.createElement('script');
+            script.id = id;
+            script.src = src;
+            script.onload = callback;
+            document.head.appendChild(script);
+        } else {
+            if (script.getAttribute('data-loaded') === 'true' || typeof FullCalendar !== 'undefined') {
+                callback();
+            } else {
+                script.addEventListener('load', callback);
+            }
+        }
+    }
+
+    function openModal() {
+        prevFocus = document.activeElement;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+
+        if (!calInstance) {
+            loadScript(fleetbooking_config.fc_url, 'local-fullcalendar-script', function () {
+                if (typeof FullCalendar !== 'undefined' && typeof FullCalendar.globalLocales === 'undefined') {
+                    FullCalendar.globalLocales = [];
+                }
+                loadScript(fleetbooking_config.fc_locale_url, 'local-fullcalendar-locale-script', function () {
+                    var script = document.getElementById('local-fullcalendar-locale-script');
+                    if (script) script.setAttribute('data-loaded', 'true');
+                    initCalendar();
+                });
+            });
+        } else {
+            setTimeout(function() {
+                calInstance.updateSize();
+            }, 50);
+        }
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        if (prevFocus) prevFocus.focus();
+    }
+
+    function initCalendar() {
+        var ajaxUrl = fleetbooking_config.ajax_url + '/calendar.php'
+            + '?modal_mode=1'
+            + '&itemtype=' + encodeURIComponent(fleetbooking_config.itemtype);
+
+        calInstance = new FullCalendar.Calendar(calDiv, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            height: 'auto',
+            headerToolbar: {
+                left:   'prev,next today',
+                center: 'title',
+                right:  'dayGridMonth,listMonth'
+            },
+            events: function (info, successCb, failureCb) {
+                \$.ajax({
+                    url: ajaxUrl,
+                    type: 'GET',
+                    data: {
+                        start: info.startStr,
+                        end:   info.endStr
+                    },
+                    success: successCb,
+                    error:   failureCb
+                });
+            },
+            eventClick: function (info) {
+                // Show details only for own events
+                if (info.event.extendedProps && info.event.extendedProps.tickets_id) {
+                    info.jsEvent.preventDefault();
+                    window.open(info.event.url, '_blank', 'noopener,noreferrer');
+                }
+            }
+        });
+        calInstance.render();
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Close on backdrop click
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeModal();
+        }
+    });
+})();
+");
 
 Html::footer();
-
-
-

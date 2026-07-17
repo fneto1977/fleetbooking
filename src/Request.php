@@ -168,7 +168,7 @@ class Request extends CommonDBTM
             'id' => '2',
             'table' => $this->getTable(),
             'field' => 'start_datetime',
-            'name' => __('Start Date', 'fleetbooking'),
+            'name' => __('Pickup Date', 'fleetbooking'),
             'datatype' => 'datetime'
         ];
 
@@ -216,7 +216,7 @@ class Request extends CommonDBTM
                 'id' => '3',
                 'table' => $this->getTable(),
                 'field' => 'end_datetime',
-                'name' => __('End Date', 'fleetbooking'),
+                'name' => __('Return Date', 'fleetbooking'),
                 'datatype' => 'datetime'
             ];
 

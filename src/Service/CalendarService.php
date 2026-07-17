@@ -7,7 +7,7 @@ use GlpiPlugin\Fleetbooking\Config;
 class CalendarService
 {
 
-    public function getEvents(string $itemtype, int $items_id, string $start, string $end, int $current_request_id = 0): array
+    public function getEvents(string $itemtype, int $items_id, string $start, string $end, int $current_request_id = 0, bool $modalMode = false): array
     {
         global $DB, $CFG_GLPI;
         $events = [];
@@ -27,8 +27,9 @@ class CalendarService
         ));
 
         $config = Config::getForEntity($_SESSION['glpiactive_entity'] ?? 0);
-        $approvedColor = $config['approved_color'] ?? '#2ecc71';
-        $pendingColor = $config['pending_color'] ?? '#f1c40f';
+        $approvedColor  = $config['approved_color']  ?? '#2ecc71';
+        $pendingColor   = $config['pending_color']   ?? '#f1c40f';
+        $reservedColor  = $config['reserved_color']  ?? '#8e44ad';
 
         $target_itemtype = !empty($itemtype) ? $itemtype : ($config['vehicle_itemtype'] ?? '');
 
@@ -46,7 +47,7 @@ class CalendarService
             }
 
             $reqQuery = [
-                'FROM' => 'glpi_plugin_fleetbooking_requests',
+                'FROM' => \GlpiPlugin\Fleetbooking\Request::getTable(),
                 'WHERE' => $reqCriteria
             ];
 
@@ -73,14 +74,19 @@ class CalendarService
                     $event['textColor'] = '#ffffff';
                     $event['classNames'] = ['current-request-event'];
                 } elseif ($isMe) {
+                    // Use configured pending color + star emoji (bug fix: was hardcoded)
                     $event['title'] = sprintf(__('⭐ [My] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('PENDING', 'fleetbooking'));
-                    $event['color'] = '#d1ecf1';
-                    $event['textColor'] = '#0c5460';
-                } else {
-                    $event['title'] = $canSeeDetails
-                        ? sprintf('%s — %s — %s', $vehicleName, $user->getName(), __('PENDING', 'fleetbooking'))
-                        : sprintf('%s — %s', $vehicleName, __('PENDING', 'fleetbooking'));
                     $event['color'] = $pendingColor;
+                    $event['textColor'] = $this->calculateTextColor($pendingColor);
+                } else {
+                    $otherTitle = ($modalMode && !$canSeeDetails)
+                        ? $vehicleName // modal mode for non-privileged users: show only vehicle name
+                        : ($canSeeDetails
+                            ? sprintf('%s — %s — %s', $vehicleName, $user->getName(), __('PENDING', 'fleetbooking'))
+                            : sprintf('%s — %s', $vehicleName, __('PENDING', 'fleetbooking')));
+                    $event['title']     = $otherTitle;
+                    $event['color']     = $pendingColor;
+                    $event['textColor'] = $this->calculateTextColor($pendingColor);
                 }
 
                 $extendedProps = [
@@ -148,7 +154,7 @@ class CalendarService
 
             // Find corresponding request to get ticket ID
             $tQuery = [
-                'FROM' => 'glpi_plugin_fleetbooking_requests',
+                'FROM' => \GlpiPlugin\Fleetbooking\Request::getTable(),
                 'WHERE' => ['reservations_id' => $res['id']],
                 'LIMIT' => 1
             ];
@@ -178,14 +184,19 @@ class CalendarService
                 $event['textColor'] = '#ffffff';
                 $event['classNames'] = ['current-request-event'];
             } elseif ($isMe) {
+                // Use configured approved color + star emoji (bug fix: was hardcoded)
                 $event['title'] = sprintf(__('⭐ [Minha] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('APPROVED', 'fleetbooking'));
-                $event['color'] = '#b8daff';
-                $event['textColor'] = '#004085';
-            } else {
-                $event['title'] = $canSeeDetails
-                    ? sprintf('%s — %s — %s', $vehicleName, $res['username'], __('APPROVED', 'fleetbooking'))
-                    : sprintf('%s — %s', $vehicleName, __('APPROVED', 'fleetbooking'));
                 $event['color'] = $approvedColor;
+                $event['textColor'] = $this->calculateTextColor($approvedColor);
+            } else {
+                $otherTitle = ($modalMode && !$canSeeDetails)
+                    ? $vehicleName // modal: show only vehicle name for other users
+                    : ($canSeeDetails
+                        ? sprintf('%s — %s — %s', $vehicleName, $res['username'], __('APPROVED', 'fleetbooking'))
+                        : sprintf('%s — %s', $vehicleName, __('APPROVED', 'fleetbooking')));
+                $event['title']     = $otherTitle;
+                $event['color']     = $reservedColor; // native reservations of others use reserved_color
+                $event['textColor'] = $this->calculateTextColor($reservedColor);
             }
 
             $extendedProps = [
@@ -215,6 +226,13 @@ class CalendarService
         return $events;
     }
 
+    /**
+     * Resolves the display name for a vehicle from itemtype and items_id.
+     *
+     * @param string $itemtype  Vehicle class name.
+     * @param int    $items_id  Vehicle record ID.
+     * @return string           Vehicle name or itemtype as fallback.
+     */
     private function resolveVehicleName(string $itemtype, int $items_id): string
     {
         if (!class_exists($itemtype)) {
@@ -222,6 +240,27 @@ class CalendarService
         }
         $item = new $itemtype();
         return $item->getFromDB($items_id) ? $item->getName() : $itemtype;
+    }
+
+    /**
+     * Calculates accessible text color (black or white) for a given background hex.
+     * Uses WCAG 2.1 relative luminance formula.
+     *
+     * @param string $hexColor Background color in #rrggbb format.
+     * @return string '#ffffff' or '#333333'
+     */
+    private function calculateTextColor(string $hexColor): string
+    {
+        $hex = ltrim($hexColor, '#');
+        if (strlen($hex) !== 6) {
+            return '#333333';
+        }
+        [$r, $g, $b] = array_map(
+            fn(string $c): float => hexdec($c) / 255,
+            str_split($hex, 2)
+        );
+        $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+        return $luminance > 0.5 ? '#333333' : '#ffffff';
     }
 
     /**

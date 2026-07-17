@@ -70,6 +70,7 @@ function plugin_fleetbooking_install_db()
         `show_pending_on_calendar`      tinyint(1)    NOT NULL DEFAULT 1,
         `approved_color`                varchar(16)   NOT NULL DEFAULT '#2ecc71',
         `pending_color`                 varchar(16)   NOT NULL DEFAULT '#f1c40f',
+        `reserved_color`                varchar(16)   NOT NULL DEFAULT '#8e44ad',
         `date_creation`                 timestamp     NULL DEFAULT CURRENT_TIMESTAMP,
         `date_mod`                      timestamp     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`),

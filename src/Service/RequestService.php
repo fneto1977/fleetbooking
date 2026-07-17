@@ -188,7 +188,7 @@ class RequestService
             'items_id' => (int) ($input['items_id'] ?? 0),
             'start_datetime' => (string) ($input['start_datetime'] ?? ''),
             'end_datetime' => (string) ($input['end_datetime'] ?? ''),
-            'reason' => \Toolbox::addslashes_deep((string) ($input['reason'] ?? '')),
+            'reason' => (string) ($input['reason'] ?? ''),
             'entities_id' => (int) ($input['entities_id'] ?? ($_SESSION['glpiactive_entity'] ?? 0)),
         ];
 
@@ -223,9 +223,9 @@ class RequestService
         $group = $this->resolveManagerGroup($requesterId, $entity_id);
         $group_id = $group['id'];
 
-        $manager_id = 0;
+        $manager_ids = [];
 
-        // Native GLPI 11 Group Manager lookup
+        // Native GLPI 11 Group Manager lookup — collect ALL managers (no LIMIT)
         global $DB;
         $manager_iter = $DB->request([
             'SELECT' => ['users_id'],
@@ -234,14 +234,13 @@ class RequestService
                 'groups_id' => $group_id,
                 'is_manager' => 1
             ],
-            'LIMIT' => 1
         ]);
 
         foreach ($manager_iter as $manager_row) {
-            $manager_id = (int) $manager_row['users_id'];
+            $manager_ids[] = (int) $manager_row['users_id'];
         }
 
-        if (!$manager_id) {
+        if (empty($manager_ids)) {
             \Toolbox::logInFile('fleetbooking', sprintf(
                 __('Request creation attempt failed: group %s has no manager configured.', 'fleetbooking'),
                 $group_id
@@ -251,16 +250,17 @@ class RequestService
 
         $request = new Request();
         $reqInput = [
-            'entities_id' => $target_entity_id,
-            'requester_users_id' => $requesterId,
-            'requester_groups_id' => $group_id,
-            'manager_users_id' => $manager_id,
-            'itemtype' => $sanitizedInput['itemtype'],
-            'items_id' => $sanitizedInput['items_id'],
-            'start_datetime' => $sanitizedInput['start_datetime'],
-            'end_datetime' => $sanitizedInput['end_datetime'],
-            'reason' => $sanitizedInput['reason'],
-            'status' => Request::STATUS_PENDING
+            'entities_id'          => $target_entity_id,
+            'requester_users_id'   => $requesterId,
+            'requester_groups_id'  => $group_id,
+            'manager_users_id'     => $manager_ids[0], // first manager stored for BC
+            'manager_users_ids'    => $manager_ids,    // full list for ticket assignment
+            'itemtype'             => $sanitizedInput['itemtype'],
+            'items_id'             => $sanitizedInput['items_id'],
+            'start_datetime'       => $sanitizedInput['start_datetime'],
+            'end_datetime'         => $sanitizedInput['end_datetime'],
+            'reason'               => $sanitizedInput['reason'],
+            'status'               => Request::STATUS_PENDING
         ];
 
         $reqId = $request->add($reqInput);
@@ -278,14 +278,14 @@ class RequestService
         }
 
         \Toolbox::logInFile('fleetbooking', sprintf(
-            __('Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, manager %s.', 'fleetbooking'),
+            __('Request #%s created successfully: user %s, vehicle %s %s, period %s to %s, managers [%s].', 'fleetbooking'),
             $reqId,
             $requesterId,
             $sanitizedInput['itemtype'],
             $sanitizedInput['items_id'],
             $sanitizedInput['start_datetime'],
             $sanitizedInput['end_datetime'],
-            $manager_id
+            implode(', ', $manager_ids)
         ));
 
         $ticketService = new TicketService();
@@ -305,7 +305,7 @@ class RequestService
 
         $request->update(['id' => $reqId, 'tickets_id' => $ticketId]);
 
-        if ($requesterId == $manager_id) {
+        if (in_array($requesterId, $manager_ids, true)) {
             $request->getFromDB($reqId);
             $approvalService = new ApprovalService();
             $result = $approvalService->autoApprove($request);

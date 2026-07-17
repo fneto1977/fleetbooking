@@ -16,6 +16,16 @@ class TicketService
         $categoryId = $config['itilcategories_id'] ?? 0;
         $ticketEntityId = (int) $reqInput['entities_id'];
 
+        // Extract manager list (multi-manager support).
+        // manager_users_ids is the full list; manager_users_id is the primary (BC).
+        $managerIds = array_map('intval', $reqInput['manager_users_ids'] ?? [$reqInput['manager_users_id']]);
+        $managerIds = array_filter($managerIds, fn(int $id) => $id > 0);
+        $managerIds = array_values($managerIds);
+
+        if (empty($managerIds)) {
+            return false;
+        }
+
         $ticket = new Ticket();
 
         $vehicleName = $reqInput['itemtype'];
@@ -35,16 +45,28 @@ class TicketService
         );
 
         $ticketInput = [
-            'entities_id' => $ticketEntityId,
-            'name' => sprintf(__('Reservation for %s', 'fleetbooking'), $vehicleName),
-            'content' => $content,
-            'itilcategories_id' => $categoryId,
-            'type' => Ticket::DEMAND_TYPE,
+            'entities_id'        => $ticketEntityId,
+            'name'               => sprintf(__('Reservation for %s', 'fleetbooking'), $vehicleName),
+            'content'            => $content,
+            'itilcategories_id'  => $categoryId,
+            'type'               => Ticket::DEMAND_TYPE,
             '_users_id_requester' => $reqInput['requester_users_id'],
-            '_users_id_assign' => $reqInput['manager_users_id']
+            '_users_id_assign'   => $managerIds[0], // primary manager via ticket creation
         ];
 
         $ticketId = $ticket->add($ticketInput);
+
+        if ($ticketId && count($managerIds) > 1) {
+            // Add remaining managers as additional assignees
+            $ticketUser = new \Ticket_User();
+            foreach (array_slice($managerIds, 1) as $extraManagerId) {
+                $ticketUser->add([
+                    'tickets_id' => $ticketId,
+                    'users_id'   => $extraManagerId,
+                    'type'       => \CommonITILActor::ASSIGN,
+                ]);
+            }
+        }
 
         if ($ticketId) {
             $itemTicket = new \Item_Ticket();

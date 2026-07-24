@@ -35,6 +35,10 @@ if (isset($_POST["update"]) && isset($_POST["profiles_id"])) {
         }
     }
 
+    if (isset($_SESSION['glpiactiveprofile']['id']) && (int)$_SESSION['glpiactiveprofile']['id'] === $profiles_id) {
+        \GlpiPlugin\Fleetbooking\Profile::initProfile();
+    }
+
     Html::back();
 }
 

@@ -177,11 +177,22 @@ if ($isReadOnly) {
         $config = \GlpiPlugin\Fleetbooking\Config::getForEntity((int)($_SESSION['glpiactive_entity'] ?? 0));
         $itemtype = $config['vehicle_itemtype'] ?? '';
 
+        $glpiLangRaw  = $_SESSION['glpilanguage'] ?? 'pt_BR';
+        $fcLocaleCode = strtolower(str_replace('_', '-', substr($glpiLangRaw, 0, 5)));
+        $fcLocaleFile = 'fullcalendar.' . $fcLocaleCode . '.global.min.js';
+        $fcLocalePath = __DIR__ . '/../js/' . $fcLocaleFile;
+        if (!file_exists($fcLocalePath)) {
+            $fcLocaleFile = 'fullcalendar.pt-br.global.min.js';
+            $fcLocaleCode = 'pt-br';
+        }
+        $fcLocaleUrl = \Plugin::getWebDir('fleetbooking', true) . '/js/' . $fcLocaleFile;
+        $fcCoreUrl   = \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.global.min.js';
+
         $js_vars_admin = [
             'ajax_url'      => \Plugin::getWebDir('fleetbooking') . '/ajax',
             'itemtype'      => $itemtype,
-            'fc_url'        => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.global.min.js',
-            'fc_locale_url' => \Plugin::getWebDir('fleetbooking', true) . '/js/fullcalendar.pt-br.global.min.js',
+            'fc_url'        => $fcCoreUrl,
+            'fc_locale_url' => $fcLocaleUrl,
         ];
 
         $btnLabel = htmlspecialchars(__('View All Reservations', 'fleetbooking'), ENT_QUOTES, 'UTF-8');
@@ -273,7 +284,7 @@ if ($isReadOnly) {
 
         calInstance = new FullCalendar.Calendar(calDiv, {
             initialView: 'dayGridMonth',
-            locale: 'pt-br',
+            locale: " . json_encode($fcLocaleCode) . ",
             height: 'auto',
             headerToolbar: {
                 left:   'prev,next today',
@@ -300,6 +311,11 @@ if ($isReadOnly) {
             }
         });
         calInstance.render();
+        setTimeout(function () {
+            if (calInstance) {
+                calInstance.updateSize();
+            }
+        }, 100);
     }
 
     if (openBtn) openBtn.addEventListener('click', openModal);

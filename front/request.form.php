@@ -380,6 +380,11 @@ echo Html::scriptBlock("
             }
         });
         calInstance.render();
+        setTimeout(function () {
+            if (calInstance) {
+                calInstance.updateSize();
+            }
+        }, 100);
     }
 
     if (openBtn) openBtn.addEventListener('click', openModal);

@@ -582,3 +582,17 @@ msgstr "Token de segurança ausente. Por favor, atualize a página."
 
 
 
+
+# --- Sprint 6: botões e modal (Bug #1) ---
+msgid "View All Reservations"
+msgstr "Ver Todas as Reservas"
+
+msgid "All Reservations Calendar"
+msgstr "Calendário de Todas as Reservas"
+
+# --- CalendarService: msgids corrigidos para inglês neutro (Regra §23.11) ---
+msgid "👉 [THIS BOOKING] %1$s — %2$s"
+msgstr "👉 [ESTA RESERVA] %1$s — %2$s"
+
+msgid "⭐ [My] %1$s — %2$s"
+msgstr "⭐ [Minha] %1$s — %2$s"

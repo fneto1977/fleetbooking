@@ -1,6 +1,6 @@
 <?php
 
-function plugin_fleetbooking_install_db()
+function plugin_fleetbooking_install_db(bool $is_upgrade = false)
 {
     global $DB;
 
@@ -127,41 +127,44 @@ function plugin_fleetbooking_install_db()
         $superAdminIds = [4]; // Fallback to standard GLPI Super-Admin ID
     }
 
-    // Auto-assign rights to all profiles:
-    // Only Super-Admins have permissions (31 = full rights).
-    // All other profiles have no rights (0) by default.
-    $profilesIterator = $DB->request([
-        'SELECT' => ['id'],
-        'FROM'   => \Profile::getTable()
-    ]);
-    foreach ($profilesIterator as $profile) {
-        $profileId = (int)$profile['id'];
-        if (in_array($profileId, $superAdminIds, true)) {
-            $rightsMapping = [
-                'fleetbooking_read'    => 31,
-                'fleetbooking_request' => 31,
-                'fleetbooking_approve' => 31,
-                'fleetbooking_admin'   => 31,
-            ];
-        } else {
-            $rightsMapping = [
-                'fleetbooking_read'    => 0,
-                'fleetbooking_request' => 0,
-                'fleetbooking_approve' => 0,
-                'fleetbooking_admin'   => 0,
-            ];
-        }
+    // Auto-assign default rights to all profiles — ONLY on fresh install.
+    // On upgrade, existing rights are preserved; only newly registered rights
+    // (inserted above via ProfileRight::addProfileRights) will have value 0
+    // until the administrator configures them manually.
+    if (!$is_upgrade) {
+        $profilesIterator = $DB->request([
+            'SELECT' => ['id'],
+            'FROM'   => \Profile::getTable()
+        ]);
+        foreach ($profilesIterator as $profile) {
+            $profileId = (int)$profile['id'];
+            if (in_array($profileId, $superAdminIds, true)) {
+                $rightsMapping = [
+                    'fleetbooking_read'    => 31,
+                    'fleetbooking_request' => 31,
+                    'fleetbooking_approve' => 31,
+                    'fleetbooking_admin'   => 31,
+                ];
+            } else {
+                $rightsMapping = [
+                    'fleetbooking_read'    => 0,
+                    'fleetbooking_request' => 0,
+                    'fleetbooking_approve' => 0,
+                    'fleetbooking_admin'   => 0,
+                ];
+            }
 
-        foreach ($rightsMapping as $rightName => $value) {
-            $DB->updateOrInsert(
-                \ProfileRight::getTable(),
-                ['rights' => $value],
-                ['profiles_id' => $profileId, 'name' => $rightName]
-            );
+            foreach ($rightsMapping as $rightName => $value) {
+                $DB->updateOrInsert(
+                    \ProfileRight::getTable(),
+                    ['rights' => $value],
+                    ['profiles_id' => $profileId, 'name' => $rightName]
+                );
+            }
         }
     }
 
-    plugin_fleetbooking_create_vehicle_asset();
+    plugin_fleetbooking_create_vehicle_asset($is_upgrade);
 
     return true;
 }
@@ -171,7 +174,7 @@ function plugin_fleetbooking_install_db()
  *
  * @return void
  */
-function plugin_fleetbooking_create_vehicle_asset()
+function plugin_fleetbooking_create_vehicle_asset(bool $is_upgrade = false)
 {
     global $DB;
 
@@ -292,13 +295,37 @@ function plugin_fleetbooking_create_vehicle_asset()
         $assetDefId = (int) $DB->insertId();
     }
 
-    // Always sync glpi_profilerights for asset_veiculofrota to ensure access
-    foreach ($profilesRights as $profileId => $rights) {
-        $DB->updateOrInsert(
-            \ProfileRight::getTable(),
-            ['rights' => $rights],
-            ['profiles_id' => $profileId, 'name' => 'asset_veiculofrota']
-        );
+    // On fresh install: set default rights for asset_veiculofrota on all profiles.
+    // On upgrade: INSERT-only for profiles that do not yet have this right registered,
+    // preserving any rights the administrator has already configured.
+    if (!$is_upgrade) {
+        foreach ($profilesRights as $profileId => $rights) {
+            $DB->updateOrInsert(
+                \ProfileRight::getTable(),
+                ['rights' => $rights],
+                ['profiles_id' => $profileId, 'name' => 'asset_veiculofrota']
+            );
+        }
+    } else {
+        foreach ($profilesRights as $profileId => $defaultRights) {
+            $alreadyExists = $DB->request([
+                'COUNT' => 'c',
+                'FROM'  => \ProfileRight::getTable(),
+                'WHERE' => [
+                    'profiles_id' => $profileId,
+                    'name'        => 'asset_veiculofrota',
+                ],
+            ])->current()['c'] > 0;
+
+            if (!$alreadyExists) {
+                // New profile created after plugin install — assign safe default.
+                $DB->insert(\ProfileRight::getTable(), [
+                    'profiles_id' => $profileId,
+                    'name'        => 'asset_veiculofrota',
+                    'rights'      => $defaultRights,
+                ]);
+            }
+        }
     }
 
     if ($assetDefId > 0 && class_exists('Glpi\Asset\CustomFieldDefinition')) {

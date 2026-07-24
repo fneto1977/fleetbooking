@@ -179,13 +179,15 @@ class CalendarService
             ];
 
             if ($isCurrentRequest) {
-                $event['title'] = sprintf(__('👉 [ESTA RESERVA] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('APPROVED', 'fleetbooking'));
+                // Translators: %1$s = vehicle name, %2$s = status label
+                $event['title'] = sprintf(__('👉 [THIS BOOKING] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('APPROVED', 'fleetbooking'));
                 $event['color'] = '#27ae60'; // Darker high-contrast Green
                 $event['textColor'] = '#ffffff';
                 $event['classNames'] = ['current-request-event'];
             } elseif ($isMe) {
                 // Use configured approved color + star emoji (bug fix: was hardcoded)
-                $event['title'] = sprintf(__('⭐ [Minha] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('APPROVED', 'fleetbooking'));
+                // Translators: %1$s = vehicle name, %2$s = status label
+                $event['title'] = sprintf(__('⭐ [My] %1$s — %2$s', 'fleetbooking'), $vehicleName, __('APPROVED', 'fleetbooking'));
                 $event['color'] = $approvedColor;
                 $event['textColor'] = $this->calculateTextColor($approvedColor);
             } else {

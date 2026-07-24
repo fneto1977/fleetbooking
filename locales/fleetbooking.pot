@@ -759,3 +759,26 @@ msgstr ""
 #, php-format
 msgid "Reservation for %s"
 msgstr ""
+
+# --- Sprint 6: buttons and modal ---
+msgid "View All Reservations"
+msgstr ""
+
+msgid "All Reservations Calendar"
+msgstr ""
+
+msgid "Fleet Reservation Dashboard"
+msgstr ""
+
+msgid "Period"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+# --- CalendarService: corrected msgids (Rule §23.11) ---
+msgid "👉 [THIS BOOKING] %1$s — %2$s"
+msgstr ""
+
+msgid "⭐ [My] %1$s — %2$s"
+msgstr ""

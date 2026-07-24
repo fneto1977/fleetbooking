@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Install hook
+ * Install hook — fresh install only.
+ * Sets default profile rights and creates initial DB schema.
  *
  * @return boolean
  */
@@ -13,18 +14,18 @@ function plugin_fleetbooking_install()
     if (file_exists(__DIR__ . '/sql/install.php')) {
         include_once __DIR__ . '/sql/install.php';
         if (function_exists('plugin_fleetbooking_install_db')) {
-            plugin_fleetbooking_install_db();
+            // Fresh install: apply default profile rights.
+            plugin_fleetbooking_install_db(false);
         }
     }
-
-    // Default configuration insertion placeholder
-    // Handle migrations
 
     return true;
 }
 
 /**
- * Upgrade hook
+ * Upgrade hook — preserves all existing profile rights.
+ * Runs schema migrations and registers any new rights without overwriting
+ * permissions already configured by the administrator.
  *
  * @param string $old_version
  * @return boolean
@@ -32,19 +33,23 @@ function plugin_fleetbooking_install()
 function plugin_fleetbooking_upgrade($old_version)
 {
     global $DB;
-    // We simply run install again to ensure tables and paths are correct
-    $res = plugin_fleetbooking_install();
 
-    if ($res) {
-        // Enforce version bump in DB dynamically to avoid GLPI looping the update state
-        $DB->updateOrInsert(
-            \Plugin::getTable(),
-            ['version' => PLUGIN_FLEETBOOKING_VERSION, 'state' => 1],
-            ['directory' => 'fleetbooking']
-        );
+    if (file_exists(__DIR__ . '/sql/install.php')) {
+        include_once __DIR__ . '/sql/install.php';
+        if (function_exists('plugin_fleetbooking_install_db')) {
+            // Upgrade: preserve existing rights; only insert new ones.
+            plugin_fleetbooking_install_db(true);
+        }
     }
 
-    return $res;
+    // Enforce version bump in DB to avoid GLPI looping the update state.
+    $DB->updateOrInsert(
+        \Plugin::getTable(),
+        ['version' => PLUGIN_FLEETBOOKING_VERSION, 'state' => 1],
+        ['directory' => 'fleetbooking']
+    );
+
+    return true;
 }
 
 /**

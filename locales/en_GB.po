@@ -582,3 +582,17 @@ msgstr "Security token missing. Please refresh the page."
 
 
 
+
+# --- Sprint 6: buttons and modal (Bug #1) ---
+msgid "View All Reservations"
+msgstr "View All Reservations"
+
+msgid "All Reservations Calendar"
+msgstr "All Reservations Calendar"
+
+# --- CalendarService: corrected msgids (Rule §23.11) ---
+msgid "👉 [THIS BOOKING] %1$s — %2$s"
+msgstr "👉 [THIS BOOKING] %1$s — %2$s"
+
+msgid "⭐ [My] %1$s — %2$s"
+msgstr "⭐ [My] %1$s — %2$s"

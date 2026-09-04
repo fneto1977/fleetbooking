@@ -58,12 +58,47 @@ try {
         echo "<tr class='tab_bg_1'><th>" . __('Start Date', 'fleetbooking') . "</th><td>" . Html::convDateTime($reqData['start_datetime']) . "</td></tr>";
         echo "<tr class='tab_bg_1'><th>" . __('End Date', 'fleetbooking') . "</th><td>" . Html::convDateTime($reqData['end_datetime']) . "</td></tr>";
 
+        // Driver Information
+        $idTypeLabel = ($reqData['driver_id_type'] ?? 'cpf') === 'registration' ? __('Employee ID / Registration', 'fleetbooking') : __('CPF', 'fleetbooking');
+        $idValue = ($reqData['driver_id_type'] ?? 'cpf') === 'registration' ? ($reqData['driver_registration'] ?? '-') : ($reqData['driver_cpf'] ?? '-');
+        echo "<tr class='tab_bg_1'><th>" . __('Driver Identification', 'fleetbooking') . "</th><td><strong>$idTypeLabel:</strong> " . htmlspecialchars($idValue, ENT_QUOTES, 'UTF-8') . "</td></tr>";
+
+        $cnhInfo = htmlspecialchars($reqData['driver_cnh_number'] ?? '-', ENT_QUOTES, 'UTF-8');
+        if (!empty($reqData['driver_cnh_category'])) {
+            $cnhInfo .= ' (Cat: ' . htmlspecialchars($reqData['driver_cnh_category'], ENT_QUOTES, 'UTF-8') . ')';
+        }
+        echo "<tr class='tab_bg_1'><th>" . __('CNH Details', 'fleetbooking') . "</th><td>" . $cnhInfo . "</td></tr>";
+
+        $cnhExpiryFormatted = !empty($reqData['driver_cnh_expiry']) ? Html::convDate($reqData['driver_cnh_expiry']) : '-';
+        $isCnhExpired = false;
+        if (!empty($reqData['driver_cnh_expiry']) && !empty($reqData['end_datetime'])) {
+            $isCnhExpired = (substr($reqData['driver_cnh_expiry'], 0, 10) < substr($reqData['end_datetime'], 0, 10));
+        }
+        $cnhStatusBadge = $isCnhExpired
+            ? "<span class='badge bg-danger' style='margin-left:8px;'>" . __('Expired on return date ⚠️', 'fleetbooking') . "</span>"
+            : "<span class='badge bg-success' style='margin-left:8px;'>" . __('Valid ✅', 'fleetbooking') . "</span>";
+        echo "<tr class='tab_bg_1'><th>" . __('CNH Expiry Date', 'fleetbooking') . "</th><td>" . $cnhExpiryFormatted . " " . $cnhStatusBadge . "</td></tr>";
+
+        // Policy Acceptance Status
+        $policyAcceptedInfo = !empty($reqData['policy_accepted_at'])
+            ? sprintf(__('Accepted on %s (IP: %s)', 'fleetbooking'), Html::convDateTime($reqData['policy_accepted_at']), htmlspecialchars($reqData['policy_accepted_ip'] ?? '-', ENT_QUOTES, 'UTF-8'))
+            : __('Not recorded', 'fleetbooking');
+        echo "<tr class='tab_bg_1'><th>" . __('Vehicle Usage Policy', 'fleetbooking') . "</th><td>" . $policyAcceptedInfo . "</td></tr>";
+
         echo "<tr class='tab_bg_1'><th>" . __('Reason', 'fleetbooking') . "</th><td>" . nl2br(htmlspecialchars((string) ($reqData['reason'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td></tr>";
 
         if ($reqData['status'] !== 'pending') {
             echo "<tr class='tab_bg_1'><th>" . __('Decision Comment', 'fleetbooking') . "</th><td>" . nl2br(htmlspecialchars((string) ($reqData['decision_comment'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td></tr>";
             if ($reqData['reservations_id']) {
                 echo "<tr class='tab_bg_1'><th>" . __('Real Reservation ID', 'fleetbooking') . "</th><td>#" . $reqData['reservations_id'] . "</td></tr>";
+            }
+            if (!empty($reqData['term_document_id'])) {
+                $docUrl = $CFG_GLPI['root_doc'] . '/front/document.send.php?docid=' . (int) $reqData['term_document_id'];
+                echo "<tr class='tab_bg_1'><th>" . __('Responsibility Term', 'fleetbooking') . "</th><td>";
+                echo "<a href='" . htmlspecialchars($docUrl, ENT_QUOTES, 'UTF-8') . "' target='_blank' class='btn btn-sm btn-primary' style='display:inline-flex;align-items:center;gap:6px;'>";
+                echo "<i class='ti ti-file-text'></i> " . __('Download Responsibility Term (PDF)', 'fleetbooking');
+                echo "</a>";
+                echo "</td></tr>";
             }
         }
 

@@ -148,7 +148,24 @@ class ApprovalService
                 ));
 
                 $ticketService->addFollowup($reqFields['tickets_id'], sprintf(__('Reservation APPROVED and created successfully. (ID: %s)<br>Comment: %s', 'fleetbooking'), $reservationId, $comment));
-            } else {
+
+                // Generate and attach Responsibility Term PDF to Ticket
+                try {
+                    $termService = new ResponsibilityTermService();
+                    $documentId = $termService->generateAndAttach((int) $lockedRequest->getID());
+                    if ($documentId > 0) {
+                        $ticketService->addFollowup(
+                            $reqFields['tickets_id'],
+                            sprintf(__('Responsibility Term generated and attached to this ticket (Document #%s).', 'fleetbooking'), $documentId)
+                        );
+                    }
+                } catch (\Throwable $termEx) {
+                    \Toolbox::logInFile('fleetbooking', sprintf(
+                        'Error generating responsibility term for request #%s: %s',
+                        $lockedRequest->getID(),
+                        str_replace(["\n", "\r", "\t"], ' ', $termEx->getMessage())
+                    ));
+                }
                 \Toolbox::logInFile('fleetbooking', sprintf(
                     __('Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: %s.', 'fleetbooking'),
                     $lockedRequest->getID(),

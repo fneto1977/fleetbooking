@@ -117,6 +117,30 @@ class Config extends CommonDBTM
             }
         }
 
+        // Ensure policy_document_path exists
+        if (!$DB->fieldExists(self::getTable(), 'policy_document_path')) {
+            try {
+                $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD COLUMN `policy_document_path` varchar(255) DEFAULT NULL AFTER `reserved_color`");
+            } catch (\Exception $e) {
+                \Toolbox::logInFile('fleetbooking', sprintf(
+                    __('Schema migration (policy_document_path) failed: %s', 'fleetbooking'),
+                    str_replace(["\n", "\r", "\t"], ' ', $e->getMessage())
+                ));
+            }
+        }
+
+        // Ensure term_template_path exists
+        if (!$DB->fieldExists(self::getTable(), 'term_template_path')) {
+            try {
+                $DB->doQuery("ALTER TABLE `glpi_plugin_fleetbooking_configs` ADD COLUMN `term_template_path` varchar(255) DEFAULT NULL AFTER `policy_document_path`");
+            } catch (\Exception $e) {
+                \Toolbox::logInFile('fleetbooking', sprintf(
+                    __('Schema migration (term_template_path) failed: %s', 'fleetbooking'),
+                    str_replace(["\n", "\r", "\t"], ' ', $e->getMessage())
+                ));
+            }
+        }
+
         // Ensure the root entity (0) has a configuration row
         $has_root = $DB->request([
             'COUNT' => 'c',
@@ -156,6 +180,8 @@ class Config extends CommonDBTM
                 'approved_color' => $clone_from ? ($clone_from['approved_color'] ?? '#2ecc71') : '#2ecc71',
                 'pending_color' => $clone_from ? ($clone_from['pending_color'] ?? '#f1c40f') : '#f1c40f',
                 'reserved_color' => $clone_from ? ($clone_from['reserved_color'] ?? '#8e44ad') : '#8e44ad',
+                'policy_document_path' => $clone_from ? ($clone_from['policy_document_path'] ?? null) : null,
+                'term_template_path' => $clone_from ? ($clone_from['term_template_path'] ?? null) : null,
             ]);
         }
     }
@@ -186,6 +212,12 @@ class Config extends CommonDBTM
                 if (!isset($fields['observer_groups_id'])) {
                     $fields['observer_groups_id'] = 0;
                 }
+                if (!isset($fields['policy_document_path'])) {
+                    $fields['policy_document_path'] = null;
+                }
+                if (!isset($fields['term_template_path'])) {
+                    $fields['term_template_path'] = null;
+                }
                 return $fields;
             }
         }
@@ -204,7 +236,40 @@ class Config extends CommonDBTM
             'approved_color' => '#2ecc71',
             'pending_color' => '#f1c40f',
             'reserved_color' => '#8e44ad',
+            'policy_document_path' => null,
+            'term_template_path' => null,
         ];
+    }
+
+    /**
+     * Get the directory where custom fleet documents are stored.
+     */
+    public static function getDocDir(): string
+    {
+        $dir = defined('GLPI_PLUGIN_DOC_DIR')
+            ? GLPI_PLUGIN_DOC_DIR . '/fleetbooking/docs'
+            : (defined('GLPI_DOC_DIR') ? GLPI_DOC_DIR . '/_plugins/fleetbooking/docs' : dirname(__DIR__) . '/public/docs');
+
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        return $dir;
+    }
+
+    /**
+     * Get URL for viewing the active Vehicle Usage Policy.
+     */
+    public static function getPolicyDocumentUrl(int $entities_id): string
+    {
+        return \Plugin::getWebDir('fleetbooking', true) . '/front/document.send.php?doc=policy&entities_id=' . $entities_id;
+    }
+
+    /**
+     * Get URL for viewing the active Responsibility Term template/model.
+     */
+    public static function getTermTemplateUrl(int $entities_id): string
+    {
+        return \Plugin::getWebDir('fleetbooking', true) . '/front/document.send.php?doc=term_template&entities_id=' . $entities_id;
     }
 
     /**
@@ -219,13 +284,12 @@ class Config extends CommonDBTM
         $current = self::getForEntity($entities_id);
         $action = \Plugin::getWebDir('fleetbooking') . '/front/config.form.php';
 
-        echo "<form method='post' action='" . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . "'>";
+        echo "<form method='post' action='" . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . "' enctype='multipart/form-data'>";
         echo "<input type='hidden' name='entities_id' value='" . (int) $entities_id . "'>";
 
         if (isset($current['id']) && (int) $current['entities_id'] === (int) $entities_id) {
             echo "<input type='hidden' name='id' value='" . (int) $current['id'] . "'>";
         }
-
 
         echo "<table class='tab_cadre_fixe'>";
         echo "<tr><th colspan='2'>" . self::getTypeName() . "</th></tr>";
@@ -347,6 +411,49 @@ class Config extends CommonDBTM
 
         echo "<tr class='tab_bg_1'><td>" . __('Workday End Time', 'fleetbooking') . "</td><td>";
         echo "<input type='time' name='workday_end' value='" . htmlspecialchars($current['workday_end'], ENT_QUOTES) . "' required>";
+        echo "</td></tr>";
+
+        // Fleet Documents Section
+        echo "<tr><th colspan='2'>" . __('Fleet Documents', 'fleetbooking') . "</th></tr>";
+
+        // Policy Document Upload & View
+        $policyUrl = self::getPolicyDocumentUrl($entities_id);
+        $hasCustomPolicy = !empty($current['policy_document_path']) && file_exists($current['policy_document_path']);
+        echo "<tr class='tab_bg_1'><td>" . __('Vehicle Usage Policy', 'fleetbooking') . " (PDF)</td><td>";
+        echo "<div style='display:flex;align-items:center;gap:12px;flex-wrap:wrap;'>";
+        echo "<input type='file' name='policy_document' accept='.pdf,application/pdf' class='form-control' style='width:auto;'>";
+        echo "<a href='" . htmlspecialchars($policyUrl, ENT_QUOTES, 'UTF-8') . "' target='_blank' rel='noopener' class='btn btn-sm btn-outline-secondary' style='display:inline-flex;align-items:center;gap:4px;'>";
+        echo "<i class='ti ti-file-text'></i> " . __('View current', 'fleetbooking');
+        echo "</a>";
+        if ($hasCustomPolicy) {
+            echo "<span class='badge bg-success' style='font-size:0.8em;padding:4px 8px;'>" . __('Custom Document Active', 'fleetbooking') . "</span>";
+        } else {
+            echo "<span class='badge bg-secondary' style='font-size:0.8em;padding:4px 8px;'>" . __('Default Document Active', 'fleetbooking') . "</span>";
+        }
+        echo "</div>";
+        echo "<div style='color:#555; font-size:0.85em; margin-top:4px;'>";
+        echo __('Upload a custom PDF policy to replace the default for this entity.', 'fleetbooking');
+        echo "</div>";
+        echo "</td></tr>";
+
+        // Responsibility Term Template Upload & View
+        $termUrl = self::getTermTemplateUrl($entities_id);
+        $hasCustomTerm = !empty($current['term_template_path']) && file_exists($current['term_template_path']);
+        echo "<tr class='tab_bg_1'><td>" . __('Responsibility Term Template', 'fleetbooking') . " (PDF)</td><td>";
+        echo "<div style='display:flex;align-items:center;gap:12px;flex-wrap:wrap;'>";
+        echo "<input type='file' name='term_template_document' accept='.pdf,application/pdf' class='form-control' style='width:auto;'>";
+        echo "<a href='" . htmlspecialchars($termUrl, ENT_QUOTES, 'UTF-8') . "' target='_blank' rel='noopener' class='btn btn-sm btn-outline-secondary' style='display:inline-flex;align-items:center;gap:4px;'>";
+        echo "<i class='ti ti-file-text'></i> " . __('View current', 'fleetbooking');
+        echo "</a>";
+        if ($hasCustomTerm) {
+            echo "<span class='badge bg-success' style='font-size:0.8em;padding:4px 8px;'>" . __('Custom Document Active', 'fleetbooking') . "</span>";
+        } else {
+            echo "<span class='badge bg-secondary' style='font-size:0.8em;padding:4px 8px;'>" . __('Default Document Active', 'fleetbooking') . "</span>";
+        }
+        echo "</div>";
+        echo "<div style='color:#555; font-size:0.85em; margin-top:4px;'>";
+        echo __('Upload a custom PDF reference for the driver responsibility term.', 'fleetbooking');
+        echo "</div>";
         echo "</td></tr>";
 
         echo "<tr class='tab_bg_2'><td colspan='2' class='center'>";

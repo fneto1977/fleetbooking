@@ -18,3 +18,8 @@ vendor/
 # Arquivos de log e temporários
 *.log
 *.tmp
+
+# Documentos e PDFs privados de teste
+*.pdf
+public/docs/
+documentation/

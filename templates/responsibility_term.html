@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Termo de Responsabilidade do Condutor</title>
+    <style>
+        @page {
+            margin: 20mm 15mm 20mm 15mm;
+            size: A4 portrait;
+        }
+        body {
+            font-family: 'DejaVu Sans', Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+        .header h1 {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header h2 {
+            font-size: 11pt;
+            color: #475569;
+            margin: 0;
+            font-weight: normal;
+        }
+        .section-title {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #0f172a;
+            background: #f1f5f9;
+            padding: 5px 8px;
+            border-left: 4px solid #2563eb;
+            margin-top: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+        .info-table td {
+            padding: 4px 6px;
+            vertical-align: top;
+            font-size: 9.5pt;
+        }
+        .info-table .label {
+            font-weight: bold;
+            color: #334155;
+            width: 25%;
+        }
+        .info-table .value {
+            color: #0f172a;
+            width: 75%;
+        }
+        .info-table .col-half {
+            width: 50%;
+        }
+        .clauses {
+            margin: 10px 0;
+            padding-left: 18px;
+            font-size: 9pt;
+            color: #334155;
+            text-align: justify;
+        }
+        .clauses li {
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+        .signature-box {
+            margin-top: 20px;
+            border: 2px solid #2563eb;
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 12px 16px;
+            text-align: center;
+        }
+        .signature-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 9pt;
+            font-weight: bold;
+            padding: 3px 12px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .signature-text {
+            font-size: 9.5pt;
+            color: #0f172a;
+            font-weight: 500;
+            margin: 4px 0;
+        }
+        .signature-meta {
+            font-size: 8.5pt;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        .footer {
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 7.5pt;
+            color: #94a3b8;
+            text-align: center;
+        }
+        .hash {
+            font-family: 'Courier New', Courier, monospace;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Termo de Responsabilidade do Condutor</h1>
+        <h2>Gestão e Uso de Veículo da Frota</h2>
+    </div>
+
+    <div class="section-title">1. Identificação do Condutor</div>
+    <table class="info-table">
+        <tr>
+            <td class="label">Nome Completo:</td>
+            <td class="value"><strong>{{driver_name}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">{{driver_id_label}}:</td>
+            <td class="value">{{driver_id_value}}</td>
+        </tr>
+        <tr>
+            <td class="label">Registro CNH:</td>
+            <td class="value">{{driver_cnh_number}} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Categoria:</strong> {{driver_cnh_category}} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Validade:</strong> {{driver_cnh_expiry}}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">2. Dados do Veículo e da Reserva</div>
+    <table class="info-table">
+        <tr>
+            <td class="label">Veículo:</td>
+            <td class="value"><strong>{{vehicle_name}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Placa:</td>
+            <td class="value"><strong>{{vehicle_plate}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Período Autorizado:</td>
+            <td class="value">De <strong>{{start_date}}</strong> até <strong>{{end_date}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Motivo / Finalidade:</td>
+            <td class="value">{{reason}}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">3. Declarações e Compromissos do Condutor</div>
+    <ol class="clauses">
+        <li>Declaro que li, compreendi e concordo integralmente com todas as normas estabelecidas na <strong>Política de Gestão e Uso de Veículos da Frota</strong> da empresa.</li>
+        <li>Declaro que minha Carteira Nacional de Habilitação (CNH) encontra-se regular, válida e compatível com a categoria do veículo requisitado, comprometendo-me a portá-la durante toda a condução.</li>
+        <li>Comprometo-me a zelar pela conservação, limpeza e integridade do veículo, bem como a utilizá-lo estritamente no interesse e a serviço das atividades autorizadas.</li>
+        <li>Assumo total responsabilidade pelas infrações de trânsito que porventura venha a cometer na vigência deste empréstimo, autorizando a identificação de condutor e o ressarcimento dos respectivos valores na forma da lei.</li>
+        <li>Comprometo-me a realizar a inspeção visual preliminar (nível de combustível, avarias e equipamentos obrigatórios) e a comunicar imediatamente qualquer anomalia, sinistro ou ocorrência à gestão da frota.</li>
+        <li>Comprometo-me a efetuar a devolução do veículo no local, data e horário previamente acordados e registrados nesta requisição.</li>
+    </ol>
+
+    <div class="signature-box">
+        <div class="signature-badge">✓ Aceite Eletrônico Registrado</div>
+        <div class="signature-text">{{acceptance_stamp}}</div>
+        <div class="signature-meta">
+            Requisição FleetBooking #{{request_id}} &nbsp;•&nbsp; Chamado GLPI #{{ticket_id}} &nbsp;•&nbsp; Emissão: {{issue_date}}
+        </div>
+    </div>
+
+    <div class="footer">
+        Documento gerado automaticamente pelo Sistema GLPI — Plugin FleetBooking.<br>
+        Código de Autenticidade / SHA-256: <span class="hash">{{verification_hash}}</span>
+    </div>
+
+</body>
+</html>

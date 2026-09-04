@@ -20,7 +20,37 @@ $allowedFields = [
     'show_pending_on_calendar',
     'approved_color',
     'pending_color',
+    'reserved_color',
+    'policy_document_path',
+    'term_template_path',
 ];
+
+$entities_id = (int) ($_POST['entities_id'] ?? $_SESSION['glpiactive_entity'] ?? 0);
+
+// Process uploaded documents
+$docDir = \GlpiPlugin\Fleetbooking\Config::getDocDir();
+
+if (isset($_FILES['policy_document']) && is_uploaded_file($_FILES['policy_document']['tmp_name'])) {
+    $fileInfo = $_FILES['policy_document'];
+    $ext = strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION));
+    if ($ext === 'pdf' && $fileInfo['error'] === UPLOAD_ERR_OK) {
+        $targetFile = $docDir . '/policy_entity_' . $entities_id . '_' . time() . '.pdf';
+        if (move_uploaded_file($fileInfo['tmp_name'], $targetFile)) {
+            $_POST['policy_document_path'] = $targetFile;
+        }
+    }
+}
+
+if (isset($_FILES['term_template_document']) && is_uploaded_file($_FILES['term_template_document']['tmp_name'])) {
+    $fileInfo = $_FILES['term_template_document'];
+    $ext = strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION));
+    if ($ext === 'pdf' && $fileInfo['error'] === UPLOAD_ERR_OK) {
+        $targetFile = $docDir . '/term_template_entity_' . $entities_id . '_' . time() . '.pdf';
+        if (move_uploaded_file($fileInfo['tmp_name'], $targetFile)) {
+            $_POST['term_template_path'] = $targetFile;
+        }
+    }
+}
 
 if (isset($_POST["update"])) {
     Session::validateCSRF($_POST['_glpi_csrf_token'] ?? '');

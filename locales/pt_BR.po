@@ -596,3 +596,149 @@ msgstr "👉 [ESTA RESERVA] %1$s — %2$s"
 
 msgid "⭐ [My] %1$s — %2$s"
 msgstr "⭐ [Minha] %1$s — %2$s"
+
+# --- Sprint 1, 2, 3: Política, Condutor e Termo de Responsabilidade ---
+msgid "I have read and agree to the %sVehicle Usage Policy%s. Reading and agreement are mandatory before submitting this reservation request."
+msgstr "Li e concordo com a %sPolítica de Uso de Veículos%s. A leitura e concordância são obrigatórias antes de enviar esta solicitação de reserva."
+
+msgid "You must accept the Vehicle Usage Policy before submitting."
+msgstr "Você deve aceitar a Política de Uso de Veículos antes de enviar."
+
+msgid "You must accept the Vehicle Usage Policy before submitting a reservation request."
+msgstr "Você deve aceitar a Política de Uso de Veículos antes de enviar a solicitação de reserva."
+
+msgid "Fleet Documents"
+msgstr "Documentos da Frota"
+
+msgid "Vehicle Usage Policy"
+msgstr "Política de Uso de Veículos"
+
+msgid "Responsibility Term Template"
+msgstr "Modelo do Termo de Responsabilidade"
+
+msgid "Upload a custom PDF policy to replace the default for this entity."
+msgstr "Envie um PDF customizado da política para substituir o padrão desta entidade."
+
+msgid "Upload a custom PDF reference for the driver responsibility term."
+msgstr "Envie um PDF customizado de referência para o termo de responsabilidade do condutor."
+
+msgid "View current"
+msgstr "Visualizar atual"
+
+msgid "Custom Document Active"
+msgstr "Documento Customizado Ativo"
+
+msgid "Default Document Active"
+msgstr "Documento Padrão Ativo"
+
+msgid "Driver Information"
+msgstr "Dados do Condutor"
+
+msgid "Identification"
+msgstr "Identificação"
+
+msgid "CPF"
+msgstr "CPF"
+
+msgid "Employee ID / Registration"
+msgstr "Matrícula do Funcionário"
+
+msgid "Enter employee ID or registration"
+msgstr "Informe a matrícula do funcionário"
+
+msgid "CNH Number"
+msgstr "Número da CNH"
+
+msgid "CNH Category"
+msgstr "Categoria da CNH"
+
+msgid "(Minimum category B required)"
+msgstr "(Categoria mínima B necessária)"
+
+msgid "CNH Expiry Date"
+msgstr "Validade da CNH"
+
+msgid "CPF is mandatory when CPF identification is selected."
+msgstr "O CPF é obrigatório quando a identificação por CPF estiver selecionada."
+
+msgid "Invalid CPF number."
+msgstr "Número de CPF inválido."
+
+msgid "Employee ID / Registration is mandatory."
+msgstr "A matrícula do funcionário é obrigatória."
+
+msgid "Employee ID / Registration must have at least 3 characters."
+msgstr "A matrícula deve ter no mínimo 3 caracteres."
+
+msgid "CNH Number is mandatory."
+msgstr "O número da CNH é obrigatório."
+
+msgid "CNH Category is mandatory."
+msgstr "A categoria da CNH é obrigatória."
+
+msgid "Invalid CNH Category. A minimum category of B is required (e.g. B, AB, C, D, E)."
+msgstr "Categoria de CNH inválida. É necessária uma categoria mínima B (ex: B, AB, C, D, E)."
+
+msgid "CNH Expiry Date is mandatory."
+msgstr "A data de validade da CNH é obrigatória."
+
+msgid "CNH will be expired on the vehicle return date (%1$s). CNH valid until: %2$s."
+msgstr "A CNH estará vencida na data de devolução do veículo (%1$s). CNH válida até: %2$s."
+
+msgid "Invalid CNH Expiry Date format."
+msgstr "Formato de data de validade da CNH inválido."
+
+msgid "Invalid identification type selected."
+msgstr "Tipo de identificação inválido selecionado."
+
+msgid "Driver Identification"
+msgstr "Identificação do Condutor"
+
+msgid "CNH Details"
+msgstr "Dados da CNH"
+
+msgid "Expired on return date ⚠️"
+msgstr "Vencida na data de devolução ⚠️"
+
+msgid "Valid ✅"
+msgstr "Válida ✅"
+
+msgid "Accepted on %s (IP: %s)"
+msgstr "Aceito em %s (IP: %s)"
+
+msgid "Not recorded"
+msgstr "Não registrado"
+
+msgid "Responsibility Term"
+msgstr "Termo de Responsabilidade"
+
+msgid "Download Responsibility Term (PDF)"
+msgstr "Baixar Termo de Responsabilidade (PDF)"
+
+msgid "Responsibility Term generated and attached to this ticket (Document #%s)."
+msgstr "Termo de Responsabilidade gerado e anexado a este chamado (Documento #%s)."
+
+msgid "Requested document not found."
+msgstr "Documento solicitado não encontrado."
+
+msgid "CNH Number must contain only numbers (up to 9 digits)."
+msgstr "O número da CNH deve conter apenas números (até 9 dígitos)."
+
+msgid "Employee ID / Registration must be numeric and contain 3 to 4 digits (e.g. 0000)."
+msgstr "A matrícula do funcionário deve conter de 3 a 4 dígitos numéricos (ex: 0000)."
+
+msgid "CNH is already expired."
+msgstr "A CNH já está vencida."
+
+msgid "Warning: CNH will be expired on the vehicle return date."
+msgstr "Atenção: A CNH estará vencida na data de devolução do veículo."
+
+msgid "CNH is valid for the period."
+msgstr "A CNH é válida para o período."
+
+msgid "CPF is valid."
+msgstr "CPF válido."
+
+msgid "Employee ID / Registration is valid."
+msgstr "Matrícula válida."
+

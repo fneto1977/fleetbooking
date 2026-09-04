@@ -249,6 +249,16 @@ class RequestService
         }
 
         $request = new Request();
+
+        $policyAcceptedAt = !empty($input['policy_accepted']) ? date('Y-m-d H:i:s') : null;
+        $policyAcceptedIp = !empty($input['policy_accepted']) ? ($_SERVER['REMOTE_ADDR'] ?? null) : null;
+        $driverIdType     = in_array($input['driver_id_type'] ?? '', ['cpf', 'registration'], true) ? $input['driver_id_type'] : 'cpf';
+        $driverCpf        = ($driverIdType === 'cpf') ? (string) ($input['driver_cpf'] ?? '') : null;
+        $driverReg        = ($driverIdType === 'registration') ? (string) ($input['driver_registration'] ?? '') : null;
+        $driverCnhNumber  = (string) ($input['driver_cnh_number'] ?? '');
+        $driverCnhCategory= strtoupper((string) ($input['driver_cnh_category'] ?? ''));
+        $driverCnhExpiry  = !empty($input['driver_cnh_expiry']) ? (string) $input['driver_cnh_expiry'] : null;
+
         $reqInput = [
             'entities_id'          => $target_entity_id,
             'requester_users_id'   => $requesterId,
@@ -260,7 +270,15 @@ class RequestService
             'start_datetime'       => $sanitizedInput['start_datetime'],
             'end_datetime'         => $sanitizedInput['end_datetime'],
             'reason'               => $sanitizedInput['reason'],
-            'status'               => Request::STATUS_PENDING
+            'status'               => Request::STATUS_PENDING,
+            'policy_accepted_at'   => $policyAcceptedAt,
+            'policy_accepted_ip'   => $policyAcceptedIp,
+            'driver_id_type'       => $driverIdType,
+            'driver_cpf'           => $driverCpf,
+            'driver_registration'  => $driverReg,
+            'driver_cnh_number'    => $driverCnhNumber,
+            'driver_cnh_category'  => $driverCnhCategory,
+            'driver_cnh_expiry'    => $driverCnhExpiry,
         ];
 
         $reqId = $request->add($reqInput);

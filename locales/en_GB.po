@@ -596,3 +596,149 @@ msgstr "👉 [THIS BOOKING] %1$s — %2$s"
 
 msgid "⭐ [My] %1$s — %2$s"
 msgstr "⭐ [My] %1$s — %2$s"
+
+# --- Sprint 1, 2, 3: Policy, Driver and Responsibility Term ---
+msgid "I have read and agree to the %sVehicle Usage Policy%s. Reading and agreement are mandatory before submitting this reservation request."
+msgstr "I have read and agree to the %sVehicle Usage Policy%s. Reading and agreement are mandatory before submitting this reservation request."
+
+msgid "You must accept the Vehicle Usage Policy before submitting."
+msgstr "You must accept the Vehicle Usage Policy before submitting."
+
+msgid "You must accept the Vehicle Usage Policy before submitting a reservation request."
+msgstr "You must accept the Vehicle Usage Policy before submitting a reservation request."
+
+msgid "Fleet Documents"
+msgstr "Fleet Documents"
+
+msgid "Vehicle Usage Policy"
+msgstr "Vehicle Usage Policy"
+
+msgid "Responsibility Term Template"
+msgstr "Responsibility Term Template"
+
+msgid "Upload a custom PDF policy to replace the default for this entity."
+msgstr "Upload a custom PDF policy to replace the default for this entity."
+
+msgid "Upload a custom PDF reference for the driver responsibility term."
+msgstr "Upload a custom PDF reference for the driver responsibility term."
+
+msgid "View current"
+msgstr "View current"
+
+msgid "Custom Document Active"
+msgstr "Custom Document Active"
+
+msgid "Default Document Active"
+msgstr "Default Document Active"
+
+msgid "Driver Information"
+msgstr "Driver Information"
+
+msgid "Identification"
+msgstr "Identification"
+
+msgid "CPF"
+msgstr "CPF"
+
+msgid "Employee ID / Registration"
+msgstr "Employee ID / Registration"
+
+msgid "Enter employee ID or registration"
+msgstr "Enter employee ID or registration"
+
+msgid "CNH Number"
+msgstr "CNH Number"
+
+msgid "CNH Category"
+msgstr "CNH Category"
+
+msgid "(Minimum category B required)"
+msgstr "(Minimum category B required)"
+
+msgid "CNH Expiry Date"
+msgstr "CNH Expiry Date"
+
+msgid "CPF is mandatory when CPF identification is selected."
+msgstr "CPF is mandatory when CPF identification is selected."
+
+msgid "Invalid CPF number."
+msgstr "Invalid CPF number."
+
+msgid "Employee ID / Registration is mandatory."
+msgstr "Employee ID / Registration is mandatory."
+
+msgid "Employee ID / Registration must have at least 3 characters."
+msgstr "Employee ID / Registration must have at least 3 characters."
+
+msgid "CNH Number is mandatory."
+msgstr "CNH Number is mandatory."
+
+msgid "CNH Category is mandatory."
+msgstr "CNH Category is mandatory."
+
+msgid "Invalid CNH Category. A minimum category of B is required (e.g. B, AB, C, D, E)."
+msgstr "Invalid CNH Category. A minimum category of B is required (e.g. B, AB, C, D, E)."
+
+msgid "CNH Expiry Date is mandatory."
+msgstr "CNH Expiry Date is mandatory."
+
+msgid "CNH will be expired on the vehicle return date (%1$s). CNH valid until: %2$s."
+msgstr "CNH will be expired on the vehicle return date (%1$s). CNH valid until: %2$s."
+
+msgid "Invalid CNH Expiry Date format."
+msgstr "Invalid CNH Expiry Date format."
+
+msgid "Invalid identification type selected."
+msgstr "Invalid identification type selected."
+
+msgid "Driver Identification"
+msgstr "Driver Identification"
+
+msgid "CNH Details"
+msgstr "CNH Details"
+
+msgid "Expired on return date ⚠️"
+msgstr "Expired on return date ⚠️"
+
+msgid "Valid ✅"
+msgstr "Valid ✅"
+
+msgid "Accepted on %s (IP: %s)"
+msgstr "Accepted on %s (IP: %s)"
+
+msgid "Not recorded"
+msgstr "Not recorded"
+
+msgid "Responsibility Term"
+msgstr "Responsibility Term"
+
+msgid "Download Responsibility Term (PDF)"
+msgstr "Download Responsibility Term (PDF)"
+
+msgid "Responsibility Term generated and attached to this ticket (Document #%s)."
+msgstr "Responsibility Term generated and attached to this ticket (Document #%s)."
+
+msgid "Requested document not found."
+msgstr "Requested document not found."
+
+msgid "CNH Number must contain only numbers (up to 9 digits)."
+msgstr "CNH Number must contain only numbers (up to 9 digits)."
+
+msgid "Employee ID / Registration must be numeric and contain 3 to 4 digits (e.g. 0000)."
+msgstr "Employee ID / Registration must be numeric and contain 3 to 4 digits (e.g. 0000)."
+
+msgid "CNH is already expired."
+msgstr "CNH is already expired."
+
+msgid "Warning: CNH will be expired on the vehicle return date."
+msgstr "Warning: CNH will be expired on the vehicle return date."
+
+msgid "CNH is valid for the period."
+msgstr "CNH is valid for the period."
+
+msgid "CPF is valid."
+msgstr "CPF is valid."
+
+msgid "Employee ID / Registration is valid."
+msgstr "Employee ID / Registration is valid."
+

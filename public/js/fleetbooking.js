@@ -155,6 +155,7 @@
             $('#fb_end_datetime').val(fmtForPicker(eD));
             $('#fb_selected_start').val(startStr.substring(0, 19));
             $('#fb_selected_end').val(endStr.substring(0, 19));
+            $('#fb_start_datetime, #fb_end_datetime').trigger('change');
 
             checkAvailability(fmtForServer(sD), fmtForServer(eD));
         }
@@ -241,6 +242,281 @@
                 var eD = new Date(endVal);
                 updatePanel(fmtForServer(sD).replace(' ', 'T'), fmtForServer(eD).replace(' ', 'T'));
                 checkAvailability(fmtForServer(sD), fmtForServer(eD));
+            }
+            checkCnhExpiry();
+        });
+
+        // ----------------------------------------------------
+        // Driver Information & Identification Validation Logic
+        // ----------------------------------------------------
+        function isValidCpf(cpf) {
+            if (!cpf) return false;
+            var clean = ('' + cpf).replace(/\D/g, '');
+            if (clean.length !== 11) return false;
+            if (/^(\d)\1{10}$/.test(clean)) return false;
+
+            var sum = 0;
+            for (var i = 0; i < 9; i++) {
+                sum += parseInt(clean.charAt(i), 10) * (10 - i);
+            }
+            var remainder = sum % 11;
+            var d1 = remainder < 2 ? 0 : 11 - remainder;
+            if (parseInt(clean.charAt(9), 10) !== d1) return false;
+
+            sum = 0;
+            for (var j = 0; j < 10; j++) {
+                sum += parseInt(clean.charAt(j), 10) * (11 - j);
+            }
+            remainder = sum % 11;
+            var d2 = remainder < 2 ? 0 : 11 - remainder;
+            return parseInt(clean.charAt(10), 10) === d2;
+        }
+
+        function isValidReg(reg) {
+            if (!reg) return false;
+            var clean = ('' + reg).replace(/\D/g, '');
+            return /^[0-9]{3,4}$/.test(clean);
+        }
+
+        function validateCpfUI(showEmptyError) {
+            var input = document.getElementById('fb_driver_cpf');
+            var $msg = $('#fb_cpf_msg');
+            var rawVal = $('#fb_driver_cpf').val() || '';
+            var clean = rawVal.replace(/\D/g, '');
+
+            if (clean.length === 0) {
+                if (showEmptyError) {
+                    var emptyMsg = i18n.cpf_mandatory || 'O CPF é obrigatório quando a identificação por CPF está selecionada.';
+                    $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + emptyMsg + '</span>');
+                    $('#fb_driver_cpf').css('border-color', '#dc2626');
+                    if (input) input.setCustomValidity(emptyMsg);
+                    return false;
+                } else {
+                    $msg.empty();
+                    $('#fb_driver_cpf').css('border-color', '');
+                    if (input) input.setCustomValidity('');
+                    return null;
+                }
+            }
+
+            if (clean.length === 11) {
+                if (isValidCpf(clean)) {
+                    var okMsg = i18n.cpf_valid || 'CPF válido.';
+                    $msg.html('<span style="color:#16a34a;font-weight:500;">✅ ' + okMsg + '</span>');
+                    $('#fb_driver_cpf').css('border-color', '#16a34a');
+                    if (input) input.setCustomValidity('');
+                    return true;
+                } else {
+                    var errMsg = i18n.cpf_invalid || 'Número de CPF inválido.';
+                    $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + errMsg + '</span>');
+                    $('#fb_driver_cpf').css('border-color', '#dc2626');
+                    if (input) input.setCustomValidity(errMsg);
+                    return false;
+                }
+            } else {
+                if (showEmptyError) {
+                    var errMsg = i18n.cpf_invalid || 'Número de CPF inválido.';
+                    $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + errMsg + '</span>');
+                    $('#fb_driver_cpf').css('border-color', '#dc2626');
+                    if (input) input.setCustomValidity(errMsg);
+                    return false;
+                } else {
+                    $msg.empty();
+                    $('#fb_driver_cpf').css('border-color', '');
+                    if (input) input.setCustomValidity('');
+                    return false;
+                }
+            }
+        }
+
+        function validateRegUI(showEmptyError) {
+            var input = document.getElementById('fb_driver_registration');
+            var $msg = $('#fb_reg_msg');
+            var rawVal = $('#fb_driver_registration').val() || '';
+            var clean = rawVal.replace(/\D/g, '');
+
+            if (clean.length === 0) {
+                if (showEmptyError) {
+                    var emptyMsg = i18n.reg_mandatory || 'A matrícula do funcionário é obrigatória.';
+                    $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + emptyMsg + '</span>');
+                    $('#fb_driver_registration').css('border-color', '#dc2626');
+                    if (input) input.setCustomValidity(emptyMsg);
+                    return false;
+                } else {
+                    $msg.empty();
+                    $('#fb_driver_registration').css('border-color', '');
+                    if (input) input.setCustomValidity('');
+                    return null;
+                }
+            }
+
+            if (isValidReg(clean)) {
+                var okMsg = i18n.reg_valid || 'Matrícula válida.';
+                $msg.html('<span style="color:#16a34a;font-weight:500;">✅ ' + okMsg + '</span>');
+                $('#fb_driver_registration').css('border-color', '#16a34a');
+                if (input) input.setCustomValidity('');
+                return true;
+            } else {
+                if (showEmptyError) {
+                    var errMsg = i18n.reg_invalid_format || 'A matrícula do funcionário deve conter de 3 a 4 dígitos numéricos (ex: 0000).';
+                    $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + errMsg + '</span>');
+                    $('#fb_driver_registration').css('border-color', '#dc2626');
+                    if (input) input.setCustomValidity(errMsg);
+                    return false;
+                } else {
+                    $msg.empty();
+                    $('#fb_driver_registration').css('border-color', '');
+                    if (input) input.setCustomValidity('');
+                    return false;
+                }
+            }
+        }
+
+        function handleIdTypeToggle() {
+            var isCpf = $('#fb_id_type_cpf').is(':checked');
+            if (isCpf) {
+                $('#fb_cpf_field_wrapper').show();
+                $('#fb_reg_field_wrapper').hide();
+                $('#fb_driver_cpf').prop('required', true);
+                $('#fb_driver_registration').prop('required', false).val('').css('border-color', '');
+                $('#fb_reg_msg').empty();
+                var regInput = document.getElementById('fb_driver_registration');
+                if (regInput) regInput.setCustomValidity('');
+            } else {
+                $('#fb_cpf_field_wrapper').hide();
+                $('#fb_reg_field_wrapper').show();
+                $('#fb_driver_cpf').prop('required', false).val('').css('border-color', '');
+                $('#fb_cpf_msg').empty();
+                var cpfInput = document.getElementById('fb_driver_cpf');
+                if (cpfInput) cpfInput.setCustomValidity('');
+                $('#fb_driver_registration').prop('required', true);
+            }
+        }
+
+        $(document).on('change', 'input[name="driver_id_type"]', handleIdTypeToggle);
+        handleIdTypeToggle();
+
+        // CPF Input Mask (000.000.000-00) & Realtime Validation
+        $(document).on('input', '#fb_driver_cpf', function () {
+            var v = $(this).val().replace(/\D/g, '');
+            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 9) {
+                v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+            } else if (v.length > 6) {
+                v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+            } else if (v.length > 3) {
+                v = v.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
+            }
+            $(this).val(v);
+            var clean = v.replace(/\D/g, '');
+            if (clean.length === 11 || clean.length === 0) {
+                validateCpfUI(false);
+            }
+        });
+        $(document).on('blur', '#fb_driver_cpf', function () {
+            validateCpfUI(true);
+        });
+
+        // Registration Input Mask (0000, 3 to 4 numeric digits) & Realtime Validation
+        $(document).on('input', '#fb_driver_registration', function () {
+            var v = $(this).val().replace(/\D/g, '');
+            if (v.length > 4) v = v.substring(0, 4);
+            $(this).val(v);
+            if (v.length >= 3 || v.length === 0) {
+                validateRegUI(false);
+            }
+        });
+        $(document).on('blur', '#fb_driver_registration', function () {
+            validateRegUI(true);
+        });
+
+        // CNH Number Mask (digits only, max 9 digits)
+        $(document).on('input', '#fb_driver_cnh_number', function () {
+            var v = $(this).val().replace(/\D/g, '');
+            if (v.length > 9) v = v.substring(0, 9);
+            $(this).val(v);
+        });
+
+        // Realtime CNH Expiry vs Vehicle Return Date validation
+        function checkCnhExpiry() {
+            var cnhVal = $('#fb_driver_cnh_expiry').val();
+            var retVal = $('#fb_end_datetime').val();
+            var $msg = $('#fb_cnh_expiry_msg');
+            var cnhInput = document.getElementById('fb_driver_cnh_expiry');
+
+            if (!cnhVal || !retVal) {
+                $msg.empty();
+                $('#fb_driver_cnh_expiry').css('border-color', '');
+                if (cnhInput) cnhInput.setCustomValidity('');
+                return true;
+            }
+
+            var cnhDate = cnhVal.substring(0, 10);
+            var retDate = retVal.substring(0, 10);
+
+            if (cnhDate < retDate) {
+                var warnText = i18n.cnh_expired_warning || 'Atenção: CNH estará vencida na data de devolução do veículo.';
+                $msg.html('<span style="color:#dc2626;font-weight:500;">⚠️ ' + warnText + '</span>');
+                $('#fb_driver_cnh_expiry').css('border-color', '#dc2626');
+                if (cnhInput) {
+                    cnhInput.setCustomValidity(warnText);
+                }
+                return false;
+            } else {
+                var okText = i18n.cnh_valid || 'CNH válida para o período';
+                $msg.html('<span style="color:#16a34a;font-weight:500;">✅ ' + okText + '</span>');
+                $('#fb_driver_cnh_expiry').css('border-color', '#16a34a');
+                if (cnhInput) {
+                    cnhInput.setCustomValidity('');
+                }
+                return true;
+            }
+        }
+
+        $(document).on('change input', '#fb_driver_cnh_expiry, #fb_end_datetime', checkCnhExpiry);
+
+        // Form submit guard
+        $('#fleetbooking-form').on('submit', function (e) {
+            var isReg = $('#fb_id_type_reg').is(':checked');
+            if (isReg) {
+                if (!validateRegUI(true)) {
+                    e.preventDefault();
+                    var regErr = i18n.reg_invalid_format || 'A matrícula do funcionário deve conter de 3 a 4 dígitos numéricos (ex: 0000).';
+                    var regVal = ($('#fb_driver_registration').val() || '').replace(/\D/g, '');
+                    if (regVal.length === 0 && i18n.reg_mandatory) {
+                        regErr = i18n.reg_mandatory;
+                    }
+                    alert(regErr);
+                    $('#fb_driver_registration').focus();
+                    return false;
+                }
+            } else {
+                if (!validateCpfUI(true)) {
+                    e.preventDefault();
+                    var cpfErr = i18n.cpf_invalid || 'Número de CPF inválido.';
+                    var cpfVal = ($('#fb_driver_cpf').val() || '').replace(/\D/g, '');
+                    if (cpfVal.length === 0 && i18n.cpf_mandatory) {
+                        cpfErr = i18n.cpf_mandatory;
+                    }
+                    alert(cpfErr);
+                    $('#fb_driver_cpf').focus();
+                    return false;
+                }
+            }
+
+            var cnhNum = ($('#fb_driver_cnh_number').val() || '').replace(/\D/g, '');
+            if (!cnhNum || cnhNum.length > 9) {
+                e.preventDefault();
+                alert(i18n.cnh_invalid_number || 'O número da CNH deve conter apenas números (até 9 dígitos).');
+                $('#fb_driver_cnh_number').focus();
+                return false;
+            }
+
+            if (!checkCnhExpiry()) {
+                e.preventDefault();
+                alert(i18n.cnh_expired_warning || 'Atenção: CNH estará vencida na data de devolução do veículo.');
+                $('#fb_driver_cnh_expiry').focus();
+                return false;
             }
         });
     });

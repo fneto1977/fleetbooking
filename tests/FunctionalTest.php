@@ -145,6 +145,22 @@ if (!class_exists('PHPUnit\Framework\TestCase')) {
     class_alias(LocalTestCase::class, 'PHPUnit\Framework\TestCase');
 }
 
+if (!function_exists('__')) {
+    function __(string $text, string $domain = 'glpi'): string {
+        return $text;
+    }
+}
+if (!function_exists('_sx')) {
+    function _sx(string $context, string $text, string $domain = 'glpi'): string {
+        return $text;
+    }
+}
+if (!function_exists('_n')) {
+    function _n(string $singular, string $plural, int $number, string $domain = 'glpi'): string {
+        return $number <= 1 ? $singular : $plural;
+    }
+}
+
 use PHPUnit\Framework\TestCase;
 
 class FunctionalTest extends TestCase
@@ -610,16 +626,18 @@ class FunctionalTest extends TestCase
         $source = $this->readSource('src/Service/RequestService.php');
 
         // Must use the standard overlap condition: existing.start < new.end AND existing.end > new.start
-        // Searches for the associative array pattern used in the DB query builder
-        $this->assertStringContainsString(
-            "glpi_reservations.begin' => ['<', \$end",
-            $source,
+        $hasStartOverlap = (strpos($source, "'.begin' => ['<', \$end") !== false)
+            || (strpos($source, "begin' => ['<', \$end") !== false);
+        $this->assertTrue(
+            $hasStartOverlap,
             'Conflict query must check existing.start < new.end.'
         );
 
-        $this->assertStringContainsString(
-            "glpi_reservations.end' => ['>', \$start",
-            $source,
+        $hasEndOverlap = (strpos($source, "'.end'   => ['>', \$start") !== false)
+            || (strpos($source, "end'   => ['>', \$start") !== false)
+            || (strpos($source, "end' => ['>', \$start") !== false);
+        $this->assertTrue(
+            $hasEndOverlap,
             'Conflict query must check existing.end > new.start.'
         );
     }
@@ -631,15 +649,13 @@ class FunctionalTest extends TestCase
     {
         $source = $this->readSource('src/Service/RequestService.php');
 
-        $this->assertStringContainsString(
-            'glpi_reservations',
-            $source,
+        $this->assertTrue(
+            strpos($source, 'glpi_reservations') !== false || strpos($source, '\Reservation::getTable()') !== false,
             'getConflicts must query glpi_reservations table.'
         );
 
-        $this->assertStringContainsString(
-            'glpi_reservationitems',
-            $source,
+        $this->assertTrue(
+            strpos($source, 'glpi_reservationitems') !== false || strpos($source, '\ReservationItem::getTable()') !== false,
             'getConflicts must join glpi_reservationitems table.'
         );
     }
@@ -669,10 +685,11 @@ class FunctionalTest extends TestCase
     {
         $source = $this->readSource('src/Service/RequestService.php');
 
-        // Must check if requester equals manager
-        $this->assertStringContainsString(
-            '$requesterId == $manager_id',
-            $source,
+        // Must check if requester is in manager list
+        $hasManagerCheck = (strpos($source, 'in_array($requesterId, $manager_ids') !== false)
+            || (strpos($source, '$requesterId == $manager_id') !== false);
+        $this->assertTrue(
+            $hasManagerCheck,
             'createRequest must check if requester is the manager for auto-approval.'
         );
 
@@ -745,7 +762,8 @@ class FunctionalTest extends TestCase
         // - approval.form.php: uses haveRight + getLoginUserID
         // - profile.form.php: uses checkRight("profile", UPDATE) (non-fleetbooking right)
         // - request.view.php: included file, uses haveRight + getLoginUserID
-        $alternativeAuth = ['approval.form.php', 'profile.form.php', 'request.view.php'];
+        // - request.php, request.readonly.php: use multiple haveRight checks (read, request, approve, admin)
+        $alternativeAuth = ['approval.form.php', 'profile.form.php', 'request.view.php', 'request.php', 'request.readonly.php'];
 
         foreach ($frontFiles as $file) {
             $contents = file_get_contents($file);
@@ -799,7 +817,7 @@ class FunctionalTest extends TestCase
         $this->assertNotEmpty($ajaxFiles, 'AJAX directory must exist.');
 
         // Files that use haveRight instead of checkRight
-        $alternativeAuth = ['availability.php', 'calendar.php'];
+        $alternativeAuth = ['availability.php', 'calendar.php', 'all_reservations.php'];
 
         foreach ($ajaxFiles as $file) {
             $contents = file_get_contents($file);
@@ -1471,9 +1489,11 @@ class FunctionalTest extends TestCase
         }
 
         // Must remove profile rights
-        $this->assertStringContainsString(
-            'glpi_profilerights',
-            $source,
+        $hasRightsCleanup = (strpos($source, 'glpi_profilerights') !== false)
+            || (strpos($source, 'ProfileRight::getTable()') !== false)
+            || (strpos($source, '\ProfileRight::getTable()') !== false);
+        $this->assertTrue(
+            $hasRightsCleanup,
             'Uninstall must clean up profile rights.'
         );
     }
@@ -1743,7 +1763,327 @@ class FunctionalTest extends TestCase
             );
         }
     }
+
+    // =========================================================================
+    // SPRINT 1, 2, 3 — Policy Acceptance, Driver Data & Responsibility Term
+    // =========================================================================
+
+    /**
+     * TC-16.1 — Sensitive / test PDF documents must NOT be bundled in public/docs or git.
+     */
+    public function testPrivatePdfsNotBundled(): void
+    {
+        $this->assertFalse(
+            file_exists($this->pluginDir . '/public/docs/politica_uso_veiculo.pdf'),
+            'Private policy PDF must not be bundled in plugin package'
+        );
+        $this->assertFalse(
+            file_exists($this->pluginDir . '/public/docs/termo_responsabilidade_modelo.pdf'),
+            'Private term model PDF must not be bundled in plugin package'
+        );
+    }
+
+    /**
+     * TC-16.2 — Document sender front controller checks rights and exists.
+     */
+    public function testDocumentSendFrontController(): void
+    {
+        $this->assertFileExists(
+            $this->pluginDir . '/front/document.send.php',
+            'front/document.send.php must exist'
+        );
+        $source = $this->readSource('front/document.send.php');
+        $this->assertStringContainsString('fleetbooking_read', $source, 'document.send.php must check fleetbooking_read right');
+    }
+
+    /**
+     * TC-16.3 — Policy acceptance checkbox and server validation exist in request form.
+     */
+    public function testPolicyAcceptanceInFormAndService(): void
+    {
+        $formSource = $this->readSource('front/request.form.php');
+        $this->assertStringContainsString('policy_accepted', $formSource, 'request.form.php must contain policy_accepted checkbox');
+
+        $reqSource = $this->readSource('src/Service/RequestService.php');
+        $this->assertStringContainsString('policy_accepted_at', $reqSource, 'RequestService must persist policy_accepted_at');
+        $this->assertStringContainsString('policy_accepted_ip', $reqSource, 'RequestService must persist policy_accepted_ip');
+    }
+
+    /**
+     * TC-16.4 — Driver validation service validates valid & invalid CPFs.
+     */
+    public function testDriverValidationCpfChecks(): void
+    {
+        require_once $this->pluginDir . '/src/Service/DriverValidationService.php';
+        $validator = new \GlpiPlugin\Fleetbooking\Service\DriverValidationService();
+
+        // Valid CPFs
+        $this->assertTrue($validator->validateCpf('52998224725'), '52998224725 should be valid');
+        $this->assertTrue($validator->validateCpf('529.982.247-25'), 'Formatted CPF should be valid');
+
+        // Invalid CPFs
+        $this->assertFalse($validator->validateCpf('00000000000'), 'Repetitive CPF should be invalid');
+        $this->assertFalse($validator->validateCpf('11111111111'), 'Repetitive CPF should be invalid');
+        $this->assertFalse($validator->validateCpf('12345678901'), 'Invalid checksum CPF should be invalid');
+        $this->assertFalse($validator->validateCpf('123'), 'Short CPF should be invalid');
+    }
+
+    /**
+     * TC-16.5 — Driver validation service enforces minimum category B.
+     */
+    public function testDriverValidationCnhCategory(): void
+    {
+        require_once $this->pluginDir . '/src/Service/DriverValidationService.php';
+        $validator = new \GlpiPlugin\Fleetbooking\Service\DriverValidationService();
+
+        $this->assertTrue($validator->isValidCategory('B'), 'Category B must be valid');
+        $this->assertTrue($validator->isValidCategory('AB'), 'Category AB must be valid');
+        $this->assertTrue($validator->isValidCategory('C'), 'Category C must be valid');
+        $this->assertTrue($validator->isValidCategory('D'), 'Category D must be valid');
+        $this->assertTrue($validator->isValidCategory('E'), 'Category E must be valid');
+
+        $this->assertFalse($validator->isValidCategory('A'), 'Category A only must be rejected (min B required)');
+        $this->assertFalse($validator->isValidCategory('ACC'), 'Category ACC must be rejected');
+        $this->assertFalse($validator->isValidCategory(''), 'Empty category must be rejected');
+    }
+
+    /**
+     * TC-16.6 — Driver validation validates CNH expiry against return date.
+     */
+    public function testDriverValidationCnhExpiryVsReturnDate(): void
+    {
+        require_once $this->pluginDir . '/src/Service/DriverValidationService.php';
+        $validator = new \GlpiPlugin\Fleetbooking\Service\DriverValidationService();
+
+        // Expired before return date
+        $res1 = $validator->validate([
+            'driver_id_type' => 'cpf',
+            'driver_cpf' => '529.982.247-25',
+            'driver_cnh_number' => '123456789',
+            'driver_cnh_category' => 'B',
+            'driver_cnh_expiry' => '2026-08-10',
+            'end_datetime' => '2026-08-15 18:00:00',
+        ]);
+        $this->assertFalse($res1['ok'], 'CNH expiring before vehicle return date must fail validation');
+
+        // Valid on return date (future date)
+        $futureYear = (int) date('Y') + 2;
+        $res2 = $validator->validate([
+            'driver_id_type' => 'cpf',
+            'driver_cpf' => '529.982.247-25',
+            'driver_cnh_number' => '123456789',
+            'driver_cnh_category' => 'B',
+            'driver_cnh_expiry' => $futureYear . '-08-15',
+            'end_datetime' => date('Y-m-d H:i:s', strtotime('+1 day')),
+        ]);
+        $this->assertTrue($res2['ok'], 'CNH valid through vehicle return date must pass validation');
+    }
+
+    /**
+     * TC-16.6.1 — Driver validation enforces CNH number numeric and up to 9 digits.
+     */
+    public function testDriverValidationCnhNumberFormat(): void
+    {
+        require_once $this->pluginDir . '/src/Service/DriverValidationService.php';
+        $validator = new \GlpiPlugin\Fleetbooking\Service\DriverValidationService();
+        $futureYear = (int) date('Y') + 2;
+
+        // Valid CNH numbers (1 to 9 digits, numeric)
+        $validNumbers = ['1', '123', '123456', '123456789'];
+        foreach ($validNumbers as $cnh) {
+            $res = $validator->validate([
+                'driver_id_type' => 'cpf',
+                'driver_cpf' => '529.982.247-25',
+                'driver_cnh_number' => $cnh,
+                'driver_cnh_category' => 'B',
+                'driver_cnh_expiry' => $futureYear . '-12-31',
+                'end_datetime' => date('Y-m-d H:i:s', strtotime('+2 days')),
+            ]);
+            $this->assertTrue($res['ok'], "CNH number '$cnh' must be accepted");
+        }
+
+        // Invalid CNH numbers (letters, special chars, more than 9 digits, empty)
+        $invalidNumbers = ['ABC123456', 'texto', '1234567890', '123-456', ''];
+        foreach ($invalidNumbers as $cnh) {
+            $res = $validator->validate([
+                'driver_id_type' => 'cpf',
+                'driver_cpf' => '529.982.247-25',
+                'driver_cnh_number' => $cnh,
+                'driver_cnh_category' => 'B',
+                'driver_cnh_expiry' => $futureYear . '-12-31',
+                'end_datetime' => date('Y-m-d H:i:s', strtotime('+2 days')),
+            ]);
+            $this->assertFalse($res['ok'], "CNH number '$cnh' must be rejected");
+        }
+    }
+
+    /**
+     * TC-16.6.2 — Driver validation enforces employee registration mask/rule (numeric, 3 to 4 digits).
+     */
+    public function testDriverValidationRegistrationFormat(): void
+    {
+        require_once $this->pluginDir . '/src/Service/DriverValidationService.php';
+        $validator = new \GlpiPlugin\Fleetbooking\Service\DriverValidationService();
+        $futureYear = (int) date('Y') + 2;
+
+        // Valid registrations (3 or 4 digits)
+        $validRegs = ['123', '0123', '9999', '001'];
+        foreach ($validRegs as $reg) {
+            $res = $validator->validate([
+                'driver_id_type' => 'registration',
+                'driver_registration' => $reg,
+                'driver_cnh_number' => '123456789',
+                'driver_cnh_category' => 'B',
+                'driver_cnh_expiry' => $futureYear . '-12-31',
+                'end_datetime' => date('Y-m-d H:i:s', strtotime('+2 days')),
+            ]);
+            $this->assertTrue($res['ok'], "Registration '$reg' must be accepted");
+        }
+
+        // Invalid registrations (<3 digits, >4 digits, letters, empty)
+        $invalidRegs = ['12', '1', '12345', 'ABCD', '01A', ''];
+        foreach ($invalidRegs as $reg) {
+            $res = $validator->validate([
+                'driver_id_type' => 'registration',
+                'driver_registration' => $reg,
+                'driver_cnh_number' => '123456789',
+                'driver_cnh_category' => 'B',
+                'driver_cnh_expiry' => $futureYear . '-12-31',
+                'end_datetime' => date('Y-m-d H:i:s', strtotime('+2 days')),
+            ]);
+            $this->assertFalse($res['ok'], "Registration '$reg' must be rejected");
+        }
+    }
+
+    /**
+     * TC-16.7 — Responsibility Term template contains all required placeholders.
+     */
+    public function testResponsibilityTermTemplatePlaceholders(): void
+    {
+        $templatePath = $this->pluginDir . '/templates/responsibility_term.html';
+        $this->assertFileExists($templatePath, 'templates/responsibility_term.html must exist');
+
+        $html = file_get_contents($templatePath);
+        $placeholders = [
+            '{{driver_name}}',
+            '{{driver_id_label}}',
+            '{{driver_id_value}}',
+            '{{driver_cnh_number}}',
+            '{{driver_cnh_category}}',
+            '{{driver_cnh_expiry}}',
+            '{{vehicle_name}}',
+            '{{vehicle_plate}}',
+            '{{start_date}}',
+            '{{end_date}}',
+            '{{acceptance_stamp}}',
+            '{{verification_hash}}',
+        ];
+
+        foreach ($placeholders as $ph) {
+            $this->assertStringContainsString(
+                $ph,
+                $html,
+                "Template must contain placeholder: $ph"
+            );
+        }
+    }
+
+    /**
+     * TC-16.8 — ResponsibilityTermService class exists and has required methods.
+     */
+    public function testResponsibilityTermServiceExists(): void
+    {
+        require_once $this->pluginDir . '/src/Service/ResponsibilityTermService.php';
+
+        $this->assertTrue(
+            class_exists('GlpiPlugin\Fleetbooking\Service\ResponsibilityTermService'),
+            'ResponsibilityTermService class must exist'
+        );
+
+        $ref = new \ReflectionClass('GlpiPlugin\Fleetbooking\Service\ResponsibilityTermService');
+        $this->assertTrue($ref->hasMethod('generateAndAttach'), 'ResponsibilityTermService must have generateAndAttach method');
+        $this->assertTrue($ref->hasMethod('collectTermData'), 'ResponsibilityTermService must have collectTermData method');
+        $this->assertTrue($ref->hasMethod('renderTemplate'), 'ResponsibilityTermService must have renderTemplate method');
+        $this->assertTrue($ref->hasMethod('renderPdf'), 'ResponsibilityTermService must have renderPdf method');
+    }
+
+    /**
+     * TC-16.9 — Schema migrations include all new Sprint 1-3 columns.
+     */
+    public function testSchemaMigrationsIncludeSprint123Columns(): void
+    {
+        $installSource = $this->readSource('sql/install.php');
+        $updateSource = $this->readSource('sql/update.php');
+
+        $cols = [
+            'policy_accepted_at',
+            'policy_accepted_ip',
+            'driver_id_type',
+            'driver_cpf',
+            'driver_registration',
+            'driver_cnh_number',
+            'driver_cnh_category',
+            'driver_cnh_expiry',
+            'term_document_id',
+        ];
+
+        foreach ($cols as $col) {
+            $this->assertStringContainsString($col, $installSource, "install.php must define column $col");
+            $this->assertStringContainsString($col, $updateSource, "update.php must migrate column $col");
+        }
+
+        $configCols = ['policy_document_path', 'term_template_path'];
+        foreach ($configCols as $col) {
+            $this->assertStringContainsString($col, $installSource, "install.php must define config column $col");
+            $this->assertStringContainsString($col, $updateSource, "update.php must migrate config column $col");
+        }
+    }
+
+    /**
+     * TC-16.10 — Weekly Calendar AJAX navigation endpoint and container exist in request.form.php.
+     */
+    public function testWeeklyCalendarAjaxEndpoint(): void
+    {
+        $source = $this->readSource('front/request.form.php');
+        $this->assertStringContainsString('ajax_calendar', $source, 'request.form.php must handle ajax_calendar requests');
+        $this->assertStringContainsString('fbRenderWeeklyCalendarContent', $source, 'request.form.php must define fbRenderWeeklyCalendarContent');
+        $this->assertStringContainsString('fb-calendar-content', $source, 'Calendar content must be wrapped in #fb-calendar-content for AJAX replacement');
+        $this->assertStringContainsString('fb-week-nav-btn', $source, 'Navigation buttons must have fb-week-nav-btn class for AJAX navigation');
+    }
+
+    /**
+     * TC-16.11 — Form draft persistence and AJAX vehicle card selection scripts exist.
+     */
+    public function testFormDraftPersistenceScript(): void
+    {
+        $source = $this->readSource('front/request.form.php');
+        $this->assertStringContainsString('fb_request_draft', $source, 'request.form.php must use fb_request_draft for sessionStorage persistence');
+        $this->assertStringContainsString('saveFormDraft', $source, 'request.form.php must define saveFormDraft');
+        $this->assertStringContainsString('restoreFormDraft', $source, 'request.form.php must define restoreFormDraft');
+        $this->assertStringContainsString('selectVehicle', $source, 'request.form.php must support AJAX vehicle selection');
+    }
+
+    /**
+     * TC-16.12 — Realtime and on-submit CPF and Employee Registration validation.
+     */
+    public function testFrontendIdentificationValidation(): void
+    {
+        $source = $this->readSource('front/request.form.php');
+        $this->assertStringContainsString('isValidCpf', $source, 'request.form.php must define isValidCpf');
+        $this->assertStringContainsString('isValidReg', $source, 'request.form.php must define isValidReg');
+        $this->assertStringContainsString('validateCpfUI', $source, 'request.form.php must define validateCpfUI');
+        $this->assertStringContainsString('validateRegUI', $source, 'request.form.php must define validateRegUI');
+        $this->assertStringContainsString('fb_cpf_msg', $source, 'request.form.php must render fb_cpf_msg feedback container');
+        $this->assertStringContainsString('fb_reg_msg', $source, 'request.form.php must render fb_reg_msg feedback container');
+
+        $jsSource = $this->readSource('public/js/fleetbooking.js');
+        $this->assertStringContainsString('isValidCpf', $jsSource, 'public/js/fleetbooking.js must define isValidCpf');
+        $this->assertStringContainsString('isValidReg', $jsSource, 'public/js/fleetbooking.js must define isValidReg');
+        $this->assertStringContainsString('validateCpfUI', $jsSource, 'public/js/fleetbooking.js must define validateCpfUI');
+        $this->assertStringContainsString('validateRegUI', $jsSource, 'public/js/fleetbooking.js must define validateRegUI');
+    }
 }
+
 
 // =============================================================================
 // STANDALONE RUNNER — Executes via `php tests/FunctionalTest.php`

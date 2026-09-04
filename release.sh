@@ -57,8 +57,8 @@ cd ..
 # Remove a versão anterior do zip, se existir
 rm -f "$ZIP_NAME"
 
-# Cria o zip ignorando o .git, o próprio script de release e os arquivos ocultos do Mac
-zip -r "$ZIP_NAME" $PLUGIN_DIR -x "$PLUGIN_DIR/.git/*" -x "$PLUGIN_DIR/release.sh" -x "*/.DS_Store" -q
+# Cria o zip ignorando o .git, o próprio script de release, arquivos ocultos do Mac e PDFs privados
+zip -r "$ZIP_NAME" $PLUGIN_DIR -x "$PLUGIN_DIR/.git/*" -x "$PLUGIN_DIR/release.sh" -x "*/.DS_Store" -x "*.pdf" -x "*/*.pdf" -q
 
 if [ ! -f "$ZIP_NAME" ]; then
     echo "❌ Erro ao gerar o arquivo ZIP."

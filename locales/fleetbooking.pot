@@ -209,10 +209,7 @@ msgstr ""
 msgid "Weekly Vehicle Availability"
 msgstr ""
 
-#: fleetbooking/front/request.form.php:162
-msgid ""
-"Please select a vehicle from the dropdown above to view its availability "
-"calendar."
+msgid "Please select a vehicle from the list above to view its availability calendar."
 msgstr ""
 
 #: fleetbooking/front/request.form.php:246
@@ -781,4 +778,11 @@ msgid "👉 [THIS BOOKING] %1$s — %2$s"
 msgstr ""
 
 msgid "⭐ [My] %1$s — %2$s"
+msgstr ""
+
+# --- Native Reservation Interception ---
+msgid "Fleet vehicles cannot be reserved directly through standard GLPI reservations. To request a vehicle, please use the 'Vehicle Reservation' card on the Home page or the 'Tools' > 'Vehicle Requests' menu."
+msgstr ""
+
+msgid "Fleet vehicle reservations cannot be modified directly through standard GLPI reservations. Please manage the request through the 'Vehicle Reservation' card on the Home page or the 'Tools' > 'Vehicle Requests' menu."
 msgstr ""

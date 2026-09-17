@@ -80,5 +80,12 @@ function plugin_fleetbooking_upgrade($current_version)
         }
     }
 
+    // ---- Migration: 1.14.0 ----
+    if (version_compare($current_version, '1.14.0', '<')) {
+        if (class_exists('GlpiPlugin\Fleetbooking\Config')) {
+            \GlpiPlugin\Fleetbooking\Config::ensureSchemaIntegrity();
+        }
+    }
+
     return true;
 }

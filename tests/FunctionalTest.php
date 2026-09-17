@@ -2082,6 +2082,127 @@ class FunctionalTest extends TestCase
         $this->assertStringContainsString('validateCpfUI', $jsSource, 'public/js/fleetbooking.js must define validateCpfUI');
         $this->assertStringContainsString('validateRegUI', $jsSource, 'public/js/fleetbooking.js must define validateRegUI');
     }
+
+    /**
+     * TC-17.1 — Native Reservation Interception Hooks (GLPI 11 Rules §11.1 & §11.3).
+     * Verifies setup.php registers pre_item_add and pre_item_update for Reservation.
+     */
+    public function testNativeReservationInterceptionHookRegistered(): void
+    {
+        $source = $this->readSource('setup.php');
+
+        $this->assertStringContainsString(
+            "'pre_item_add'",
+            $source,
+            "setup.php must register the 'pre_item_add' hook."
+        );
+
+        $this->assertStringContainsString(
+            "'pre_item_update'",
+            $source,
+            "setup.php must register the 'pre_item_update' hook."
+        );
+
+        $this->assertStringContainsString(
+            "'Reservation'",
+            $source,
+            "setup.php must bind the hooks specifically to 'Reservation'."
+        );
+
+        $this->assertStringContainsString(
+            "preItemAddReservation",
+            $source,
+            "setup.php must reference preItemAddReservation callback."
+        );
+
+        $this->assertStringContainsString(
+            "preItemUpdateReservation",
+            $source,
+            "setup.php must reference preItemUpdateReservation callback."
+        );
+    }
+
+    /**
+     * TC-17.2 — ReservationHook class structure and security lifecycle.
+     */
+    public function testReservationHookImplementation(): void
+    {
+        $hookPath = $this->pluginDir . '/src/Hook/ReservationHook.php';
+        $this->assertFileExists($hookPath, 'src/Hook/ReservationHook.php must exist.');
+
+        $source = file_get_contents($hookPath);
+        $this->assertStringContainsString('namespace GlpiPlugin\Fleetbooking\Hook;', $source);
+        $this->assertStringContainsString('class ReservationHook', $source);
+        $this->assertStringContainsString('public static function setBypass', $source);
+        $this->assertStringContainsString('public static function isBypass', $source);
+        $this->assertStringContainsString('public static function preItemAddReservation', $source);
+        $this->assertStringContainsString('public static function preItemUpdateReservation', $source);
+
+        // Verify GLPI 11 Rules §11.3 documentation requirements
+        $this->assertStringContainsString('Why it exists:', $source);
+        $this->assertStringContainsString('When it runs:', $source);
+        $this->assertStringContainsString('Which item types it affects:', $source);
+        $this->assertStringContainsString('What side effects it may produce:', $source);
+
+        // Verify cancellation mechanism: $item->input = false
+        $this->assertStringContainsString('$item->input = false', $source);
+
+        // Verify ReservationService integration
+        $resServiceSource = $this->readSource('src/Service/ReservationService.php');
+        $this->assertStringContainsString('isFleetVehicleReservation', $resServiceSource);
+        $this->assertStringContainsString("'_from_fleetbooking' => true", $resServiceSource);
+        $this->assertStringContainsString('ReservationHook::setBypass(true)', $resServiceSource);
+        $this->assertStringContainsString('ReservationHook::setBypass(false)', $resServiceSource);
+    }
+
+    /**
+     * TC-17.3 — Translation catalog consistency for vehicle selection alert.
+     */
+    public function testVehicleSelectionCatalogStringMatchesForm(): void
+    {
+        $expectedMsgid = 'Please select a vehicle from the list above to view its availability calendar.';
+
+        $ptPo = $this->readSource('locales/pt_BR.po');
+        $this->assertStringContainsString($expectedMsgid, $ptPo, 'pt_BR.po must contain the exact list msgid.');
+        $this->assertStringNotContainsString('from the dropdown above', $ptPo, 'pt_BR.po must not contain obsolete dropdown msgid.');
+
+        $enPo = $this->readSource('locales/en_GB.po');
+        $this->assertStringContainsString($expectedMsgid, $enPo, 'en_GB.po must contain the exact list msgid.');
+        $this->assertStringNotContainsString('from the dropdown above', $enPo, 'en_GB.po must not contain obsolete dropdown msgid.');
+
+        $pot = $this->readSource('locales/fleetbooking.pot');
+        $this->assertStringContainsString($expectedMsgid, $pot, 'fleetbooking.pot must contain the exact list msgid.');
+
+        // Verify compiled .mo files exist and are non-empty
+        $ptMo = $this->pluginDir . '/locales/pt_BR.mo';
+        $enMo = $this->pluginDir . '/locales/en_GB.mo';
+        $this->assertFileExists($ptMo, 'pt_BR.mo must exist.');
+        $this->assertFileExists($enMo, 'en_GB.mo must exist.');
+        $this->assertTrue(filesize($ptMo) > 1000, 'pt_BR.mo must be compiled binary catalog.');
+        $this->assertTrue(filesize($enMo) > 1000, 'en_GB.mo must be compiled binary catalog.');
+    }
+
+    /**
+     * TC-17.4 — Verify that adjusted reservation redirection messages reference Home card and Tools menu.
+     */
+    public function testNativeReservationInterceptionMessagesConfigured(): void
+    {
+        $hookSource = $this->readSource('src/Hook/ReservationHook.php');
+        $this->assertStringContainsString("Vehicle Reservation", $hookSource);
+        $this->assertStringContainsString("Tools' > 'Vehicle Requests", $hookSource);
+
+        $ptPo = $this->readSource('locales/pt_BR.po');
+        $this->assertStringContainsString("Reserva de Veículos", $ptPo);
+        $this->assertStringContainsString("Ferramentas' > 'Requisição de Veículos", $ptPo);
+
+        $enPo = $this->readSource('locales/en_GB.po');
+        $this->assertStringContainsString("Vehicle Reservation", $enPo);
+        $this->assertStringContainsString("Tools' > 'Vehicle Requests", $enPo);
+
+        $pot = $this->readSource('locales/fleetbooking.pot');
+        $this->assertStringContainsString("Vehicle Reservation", $pot);
+        $this->assertStringContainsString("Tools' > 'Vehicle Requests", $pot);
+    }
 }
 
 

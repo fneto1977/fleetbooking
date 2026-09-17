@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_FLEETBOOKING_VERSION', '1.13.0');
+define('PLUGIN_FLEETBOOKING_VERSION', '1.14.0');
 
 define('PLUGIN_FLEETBOOKING_MIN_GLPI_VERSION', '11.0.0');
 
@@ -46,6 +46,14 @@ function plugin_init_fleetbooking()
         // Add to Self-Service Homepage
         $PLUGIN_HOOKS['helpdesk_menu_entry']['fleetbooking'] = '/plugins/fleetbooking/front/request.form.php';
         $PLUGIN_HOOKS['helpdesk_menu_entry_icon']['fleetbooking'] = 'ti ti-car';
+
+        // Enforce FleetBooking workflow on vehicle reservations (GLPI 11 Rules §11.1 & §11.3)
+        $PLUGIN_HOOKS['pre_item_add']['fleetbooking'] = [
+            'Reservation' => ['GlpiPlugin\Fleetbooking\Hook\ReservationHook', 'preItemAddReservation'],
+        ];
+        $PLUGIN_HOOKS['pre_item_update']['fleetbooking'] = [
+            'Reservation' => ['GlpiPlugin\Fleetbooking\Hook\ReservationHook', 'preItemUpdateReservation'],
+        ];
     }
 }
 

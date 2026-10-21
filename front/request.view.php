@@ -36,16 +36,20 @@ try {
         $showCalendar = ($isManager || $isAdmin || $isGlpiAdmin);
         $canDecide = ($isManager || $isAdmin) && ($reqData['status'] === 'pending');
 
+        $cancelService = new \GlpiPlugin\Fleetbooking\Service\CancelService();
+        $canCancel = $cancelService->canCancel($request, (int) Session::getLoginUserID());
+
         echo "<div class='center' style='margin: 20px;'>";
         echo "<h3>" . __('Fleet Booking Request Details', 'fleetbooking') . "</h3>";
         echo "<table class='tab_cadre_fixe'>";
 
         echo "<tr class='tab_bg_1'><th style='width: 30%'>" . __('Current Status', 'fleetbooking') . "</th>";
         $statusClasses = [
-            'pending' => 'fb-status-pending',
-            'approved' => 'fb-status-approved',
-            'rejected' => 'fb-status-rejected',
-            'conflict' => 'fb-status-conflict',
+            'pending'   => 'fb-status-pending',
+            'approved'  => 'fb-status-approved',
+            'rejected'  => 'fb-status-rejected',
+            'conflict'  => 'fb-status-conflict',
+            'cancelled' => 'fb-status-cancelled',
         ];
         $statusClass = $statusClasses[$reqData['status']] ?? '';
         $statusLabel = \GlpiPlugin\Fleetbooking\Request::getAllStatuses()[$reqData['status']] ?? $reqData['status'];
@@ -88,7 +92,10 @@ try {
         echo "<tr class='tab_bg_1'><th>" . __('Reason', 'fleetbooking') . "</th><td>" . nl2br(htmlspecialchars((string) ($reqData['reason'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td></tr>";
 
         if ($reqData['status'] !== 'pending') {
-            echo "<tr class='tab_bg_1'><th>" . __('Decision Comment', 'fleetbooking') . "</th><td>" . nl2br(htmlspecialchars((string) ($reqData['decision_comment'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td></tr>";
+            $commentHeader = ($reqData['status'] === 'cancelled')
+                ? __('Cancellation Reason', 'fleetbooking')
+                : __('Decision Comment', 'fleetbooking');
+            echo "<tr class='tab_bg_1'><th>" . $commentHeader . "</th><td>" . nl2br(htmlspecialchars((string) ($reqData['decision_comment'] ?? ''), ENT_QUOTES, 'UTF-8')) . "</td></tr>";
             if ($reqData['reservations_id']) {
                 echo "<tr class='tab_bg_1'><th>" . __('Real Reservation ID', 'fleetbooking') . "</th><td>#" . $reqData['reservations_id'] . "</td></tr>";
             }
@@ -122,8 +129,36 @@ try {
             echo "</td></tr>";
             echo "</table>";
             echo "</form>";
-        } else if ($reqData['status'] === 'pending') {
+        } else if ($reqData['status'] === 'pending' && !$canCancel) {
             echo "<div class='alert alert-info'>" . __('Only the responsible manager can approve or reject this reservation.', 'fleetbooking') . "</div>";
+        }
+
+        // Cancellation UI for Requester, Manager, Technician (fleetbooking_cancel), or Admin
+        if ($canCancel) {
+            $cancelUrl = Plugin::getWebDir('fleetbooking') . '/front/cancel.form.php';
+            $confirmPrompt = __('Are you sure you want to cancel this reservation? This action cannot be undone and will release the vehicle.', 'fleetbooking');
+            echo "<div style='margin-top: 25px; padding: 15px 20px; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 6px; text-align: left;'>";
+            echo "<h4 style='color: #c53030; margin-top: 0; margin-bottom: 8px;'><i class='ti ti-ban' style='vertical-align: middle; margin-right: 6px;'></i>" . __('Cancel Reservation', 'fleetbooking') . "</h4>";
+            echo "<p style='color: #4a5568; font-size: 13px; margin-bottom: 12px;'>" . __('Cancelling will release the vehicle in the calendar, remove the schedule, and conclude this ticket.', 'fleetbooking') . "</p>";
+            echo "<form method='post' action='" . htmlspecialchars($cancelUrl, ENT_QUOTES, 'UTF-8') . "' onsubmit=\"return confirm('" . addslashes($confirmPrompt) . "');\">";
+            echo "<input type='hidden' name='_glpi_csrf_token' value='" . Session::getNewCSRFToken() . "'>";
+            echo "<input type='hidden' name='request_id' value='" . (int) $reqData['id'] . "'>";
+            echo "<input type='hidden' name='tickets_id' value='" . (int) $ticketId . "'>";
+            echo "<div style='margin-bottom: 12px;'>";
+            echo "<label style='display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #2d3748;'>" . __('Cancellation Reason (mandatory):', 'fleetbooking') . "</label>";
+            echo "<textarea name='cancel_reason' rows='3' required style='width: 100%; border: 1px solid #cbd5e0; border-radius: 4px; padding: 8px; box-sizing: border-box;' placeholder='" . htmlspecialchars(__('Please explain why this reservation is being cancelled...', 'fleetbooking'), ENT_QUOTES, 'UTF-8') . "'></textarea>";
+            echo "</div>";
+            echo "<div style='text-align: right;'>";
+            echo "<button type='submit' class='fb-btn-cancel'>";
+            echo "<i class='ti ti-x'></i> " . __('Confirm Cancellation', 'fleetbooking');
+            echo "</button>";
+            echo "</div>";
+            echo "</form>";
+            echo "</div>";
+        } elseif ($reqData['status'] === 'cancelled') {
+            echo "<div class='alert alert-secondary' style='margin-top: 20px; background: #edf2f7; border-color: #cbd5e0; color: #4a5568;'>";
+            echo "<i class='ti ti-info-circle' style='margin-right: 6px;'></i>" . __('This reservation has been cancelled.', 'fleetbooking');
+            echo "</div>";
         }
 
         echo "</div>"; // Close center/details wrapper div

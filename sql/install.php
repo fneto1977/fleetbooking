@@ -138,7 +138,7 @@ function plugin_fleetbooking_install_db(bool $is_upgrade = false)
     }
 
     // Check each profile right individually to prevent Duplicate Entry DB Exception during upgrade
-    $all_rights = ['fleetbooking_read', 'fleetbooking_request', 'fleetbooking_approve', 'fleetbooking_admin'];
+    $all_rights = ['fleetbooking_read', 'fleetbooking_request', 'fleetbooking_approve', 'fleetbooking_cancel', 'fleetbooking_admin'];
     foreach ($all_rights as $right) {
         $exists = $DB->request([
             'COUNT' => 'c',
@@ -187,6 +187,7 @@ function plugin_fleetbooking_install_db(bool $is_upgrade = false)
                 'fleetbooking_read'    => 31,
                 'fleetbooking_request' => 31,
                 'fleetbooking_approve' => 31,
+                'fleetbooking_cancel'  => 31,
                 'fleetbooking_admin'   => 31,
             ];
         } else {

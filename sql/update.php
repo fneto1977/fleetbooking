@@ -87,5 +87,56 @@ function plugin_fleetbooking_upgrade($current_version)
         }
     }
 
+    // ---- Migration: 1.15.0 ----
+    if (version_compare($current_version, '1.15.0', '<')) {
+        if (class_exists('GlpiPlugin\Fleetbooking\Config')) {
+            \GlpiPlugin\Fleetbooking\Config::ensureSchemaIntegrity();
+        }
+
+        // Register the new profile right 'fleetbooking_cancel'
+        if (class_exists('ProfileRight')) {
+            $exists = $DB->request([
+                'COUNT' => 'c',
+                'FROM'  => \ProfileRight::getTable(),
+                'WHERE' => ['name' => 'fleetbooking_cancel']
+            ])->current()['c'] > 0;
+            if (!$exists) {
+                \ProfileRight::addProfileRights(['fleetbooking_cancel']);
+            }
+
+            // Automatically grant fleetbooking_cancel to profiles that already have fleetbooking_admin
+            $adminProfiles = $DB->request([
+                'SELECT' => ['profiles_id', 'rights'],
+                'FROM'   => \ProfileRight::getTable(),
+                'WHERE'  => [
+                    'name'   => 'fleetbooking_admin',
+                    'rights' => ['>', 0]
+                ]
+            ]);
+            foreach ($adminProfiles as $ap) {
+                $profileId = (int)$ap['profiles_id'];
+                $adminRights = (int)$ap['rights'];
+                $hasCancelRight = $DB->request([
+                    'COUNT' => 'c',
+                    'FROM'  => \ProfileRight::getTable(),
+                    'WHERE' => [
+                        'profiles_id' => $profileId,
+                        'name'        => 'fleetbooking_cancel'
+                    ]
+                ])->current()['c'] > 0;
+
+                if ($hasCancelRight) {
+                    $DB->doQuery("UPDATE `" . \ProfileRight::getTable() . "` SET `rights` = $adminRights WHERE `profiles_id` = $profileId AND `name` = 'fleetbooking_cancel'");
+                } else {
+                    $DB->insert(\ProfileRight::getTable(), [
+                        'profiles_id' => $profileId,
+                        'name'        => 'fleetbooking_cancel',
+                        'rights'      => $adminRights
+                    ]);
+                }
+            }
+        }
+    }
+
     return true;
 }

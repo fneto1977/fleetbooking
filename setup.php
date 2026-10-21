@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_FLEETBOOKING_VERSION', '1.14.0');
+define('PLUGIN_FLEETBOOKING_VERSION', '1.15.0');
 
 define('PLUGIN_FLEETBOOKING_MIN_GLPI_VERSION', '11.0.0');
 
@@ -53,6 +53,14 @@ function plugin_init_fleetbooking()
         ];
         $PLUGIN_HOOKS['pre_item_update']['fleetbooking'] = [
             'Reservation' => ['GlpiPlugin\Fleetbooking\Hook\ReservationHook', 'preItemUpdateReservation'],
+        ];
+
+        // Synchronize Ticket closure/purge with FleetBooking reservations
+        $PLUGIN_HOOKS['item_update']['fleetbooking'] = [
+            'Ticket' => ['GlpiPlugin\Fleetbooking\Hook\TicketHook', 'itemUpdateTicket'],
+        ];
+        $PLUGIN_HOOKS['pre_item_purge']['fleetbooking'] = [
+            'Ticket' => ['GlpiPlugin\Fleetbooking\Hook\TicketHook', 'preItemPurgeTicket'],
         ];
     }
 }

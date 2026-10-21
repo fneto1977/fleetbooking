@@ -10,6 +10,12 @@ use GlpiPlugin\Fleetbooking\Service\ReservationService;
 
 class ApprovalService
 {
+    private static bool $inApprovalProcess = false;
+
+    public static function isInApprovalProcess(): bool
+    {
+        return self::$inApprovalProcess;
+    }
 
     public function approve(Request $request, string $comment = '', int $userId = 0): string
     {
@@ -33,6 +39,7 @@ class ApprovalService
     {
         global $DB;
 
+        self::$inApprovalProcess = true;
         $reqFields = $request->fields;
 
         // Lock mechanism to prevent race conditions
@@ -211,6 +218,8 @@ class ApprovalService
                 \Toolbox::logInFile('fleetbooking', __('Rollback failed: ', 'fleetbooking') . str_replace(["\n", "\r", "\t"], ' ', $rollbackError->getMessage()));
             }
             throw $e;
+        } finally {
+            self::$inApprovalProcess = false;
         }
     }
 }

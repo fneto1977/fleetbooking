@@ -13,6 +13,7 @@ if (isset($_POST["update"]) && isset($_POST["profiles_id"])) {
         'fleetbooking_read',
         'fleetbooking_request',
         'fleetbooking_approve',
+        'fleetbooking_cancel',
         'fleetbooking_admin'
     ];
 

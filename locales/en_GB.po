@@ -749,4 +749,59 @@ msgstr "Fleet vehicles cannot be reserved directly through standard GLPI reserva
 msgid "Fleet vehicle reservations cannot be modified directly through standard GLPI reservations. Please manage the request through the 'Vehicle Reservation' card on the Home page or the 'Tools' > 'Vehicle Requests' menu."
 msgstr "Fleet vehicle reservations cannot be modified directly through standard GLPI reservations. Please manage the request through the 'Vehicle Reservation' card on the Home page or the 'Tools' > 'Vehicle Requests' menu."
 
+# --- Cancellation Workflow ---
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgid "Cancel reservations"
+msgstr "Cancel reservations"
+
+msgid "Cancel Reservation"
+msgstr "Cancel Reservation"
+
+msgid "Cancellation reason is mandatory."
+msgstr "Cancellation reason is mandatory."
+
+msgid "Cancellation Reason (mandatory):"
+msgstr "Cancellation Reason (mandatory):"
+
+msgid "Cancellation Reason"
+msgstr "Cancellation Reason"
+
+msgid "Are you sure you want to cancel this reservation? This action cannot be undone and will release the vehicle."
+msgstr "Are you sure you want to cancel this reservation? This action cannot be undone and will release the vehicle."
+
+msgid "Cancelling will release the vehicle in the calendar, remove the schedule, and conclude this ticket."
+msgstr "Cancelling will release the vehicle in the calendar, remove the schedule, and conclude this ticket."
+
+msgid "Please explain why this reservation is being cancelled..."
+msgstr "Please explain why this reservation is being cancelled..."
+
+msgid "Confirm Cancellation"
+msgstr "Confirm Cancellation"
+
+msgid "Reservation CANCELLED successfully."
+msgstr "Reservation CANCELLED successfully."
+
+msgid "Reservation CANCELLED.<br>Cancelled by: %1$s<br>Reason: %2$s"
+msgstr "Reservation CANCELLED.<br>Cancelled by: %1$s<br>Reason: %2$s"
+
+msgid "Reservation cancelled by %1$s. Reason: %2$s"
+msgstr "Reservation cancelled by %1$s. Reason: %2$s"
+
+msgid "This reservation has been cancelled."
+msgstr "This reservation has been cancelled."
+
+msgid "You do not have permission to cancel this reservation or the reservation period has already ended."
+msgstr "You do not have permission to cancel this reservation or the reservation period has already ended."
+
+msgid "This request cannot be cancelled because it is not pending or approved."
+msgstr "This request cannot be cancelled because it is not pending or approved."
+
+msgid "Cancelled automatically because Ticket #%1$d was solved/closed or moved to trash in GLPI by %2$s."
+msgstr "Cancelled automatically because Ticket #%1$d was solved/closed or moved to trash in GLPI by %2$s."
+
+msgid "Cancelled automatically because Ticket #%1$d was permanently purged from GLPI."
+msgstr "Cancelled automatically because Ticket #%1$d was permanently purged from GLPI."
+
 

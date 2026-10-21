@@ -47,6 +47,8 @@
     --fb-status-rejected-bg: #fee2e2;
     --fb-status-conflict: #991b1b;
     --fb-status-conflict-bg: #fecaca;
+    --fb-status-cancelled: #64748b;
+    --fb-status-cancelled-bg: #f1f5f9;
 
     /* Calendar */
     --fb-calendar-bg: #ffffff;
@@ -503,6 +505,30 @@
     color: var(--fb-status-conflict);
     text-transform: uppercase;
     font-weight: 600;
+}
+
+.fb-status-cancelled {
+    color: var(--fb-status-cancelled);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.fb-btn-cancel {
+    background-color: var(--fb-danger);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--fb-radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.fb-btn-cancel:hover {
+    background-color: var(--fb-danger-text);
 }
 
 /* ===== Dark Mode ===== */

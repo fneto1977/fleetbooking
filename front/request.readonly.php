@@ -60,10 +60,11 @@ $requesterName = formatUserName(
 $statusLabels = \GlpiPlugin\Fleetbooking\Request::getAllStatuses();
 $statusLabel  = $statusLabels[$reqData['status']] ?? $reqData['status'];
 $statusCssMap = [
-    'pending'  => 'fb-status-pending',
-    'approved' => 'fb-status-approved',
-    'rejected' => 'fb-status-rejected',
-    'conflict' => 'fb-status-conflict',
+    'pending'   => 'fb-status-pending',
+    'approved'  => 'fb-status-approved',
+    'rejected'  => 'fb-status-rejected',
+    'conflict'  => 'fb-status-conflict',
+    'cancelled' => 'fb-status-cancelled',
 ];
 $statusClass = $statusCssMap[$reqData['status']] ?? '';
 

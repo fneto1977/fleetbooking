@@ -760,10 +760,11 @@ class FunctionalTest extends TestCase
 
         // Files that use alternative auth patterns (not checkRight)
         // - approval.form.php: uses haveRight + getLoginUserID
+        // - cancel.form.php: uses haveRight + getLoginUserID + fleetbooking_cancel
         // - profile.form.php: uses checkRight("profile", UPDATE) (non-fleetbooking right)
         // - request.view.php: included file, uses haveRight + getLoginUserID
         // - request.php, request.readonly.php: use multiple haveRight checks (read, request, approve, admin)
-        $alternativeAuth = ['approval.form.php', 'profile.form.php', 'request.view.php', 'request.php', 'request.readonly.php'];
+        $alternativeAuth = ['approval.form.php', 'cancel.form.php', 'profile.form.php', 'request.view.php', 'request.php', 'request.readonly.php'];
 
         foreach ($frontFiles as $file) {
             $contents = file_get_contents($file);

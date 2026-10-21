@@ -78,6 +78,7 @@ class Profile extends CommonGLPI
             'fleetbooking_read' => __('Read', 'fleetbooking'),
             'fleetbooking_request' => __('Create request', 'fleetbooking'),
             'fleetbooking_approve' => __('Approve request', 'fleetbooking'),
+            'fleetbooking_cancel' => __('Cancel reservations', 'fleetbooking'),
             'fleetbooking_admin' => __('Admin', 'fleetbooking'),
         ];
 

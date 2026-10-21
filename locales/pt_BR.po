@@ -749,4 +749,59 @@ msgstr "Veículos da frota não podem ser reservados diretamente pelas reservas 
 msgid "Fleet vehicle reservations cannot be modified directly through standard GLPI reservations. Please manage the request through the 'Vehicle Reservation' card on the Home page or the 'Tools' > 'Vehicle Requests' menu."
 msgstr "Reservas de veículos da frota não podem ser modificadas diretamente pelas reservas padrão do GLPI. Por favor, gerencie a solicitação através do card 'Reserva de Veículos' na tela inicial ou pelo menu 'Ferramentas' > 'Requisição de Veículos'."
 
+# --- Cancellation Workflow ---
+msgid "Cancelled"
+msgstr "Cancelado"
+
+msgid "Cancel reservations"
+msgstr "Cancelar reservas"
+
+msgid "Cancel Reservation"
+msgstr "Cancelar Reserva"
+
+msgid "Cancellation reason is mandatory."
+msgstr "A justificativa de cancelamento é obrigatória."
+
+msgid "Cancellation Reason (mandatory):"
+msgstr "Motivo do cancelamento (obrigatório):"
+
+msgid "Cancellation Reason"
+msgstr "Motivo do Cancelamento"
+
+msgid "Are you sure you want to cancel this reservation? This action cannot be undone and will release the vehicle."
+msgstr "Tem certeza que deseja cancelar esta reserva? Esta ação não pode ser desfeita e liberará o veículo."
+
+msgid "Cancelling will release the vehicle in the calendar, remove the schedule, and conclude this ticket."
+msgstr "O cancelamento liberará o veículo no calendário, removerá o agendamento e concluirá este chamado."
+
+msgid "Please explain why this reservation is being cancelled..."
+msgstr "Por favor, explique o motivo pelo qual esta reserva está sendo cancelada..."
+
+msgid "Confirm Cancellation"
+msgstr "Confirmar Cancelamento"
+
+msgid "Reservation CANCELLED successfully."
+msgstr "Reserva CANCELADA com sucesso."
+
+msgid "Reservation CANCELLED.<br>Cancelled by: %1$s<br>Reason: %2$s"
+msgstr "Reserva CANCELADA.<br>Cancelada por: %1$s<br>Motivo: %2$s"
+
+msgid "Reservation cancelled by %1$s. Reason: %2$s"
+msgstr "Reserva cancelada por %1$s. Motivo: %2$s"
+
+msgid "This reservation has been cancelled."
+msgstr "Esta reserva foi cancelada."
+
+msgid "You do not have permission to cancel this reservation or the reservation period has already ended."
+msgstr "Você não tem permissão para cancelar esta reserva ou o período da reserva já foi finalizado."
+
+msgid "This request cannot be cancelled because it is not pending or approved."
+msgstr "Esta solicitação não pode ser cancelada porque não está pendente ou aprovada."
+
+msgid "Cancelled automatically because Ticket #%1$d was solved/closed or moved to trash in GLPI by %2$s."
+msgstr "Cancelada automaticamente porque o Chamado #%1$d foi solucionado/fechado ou enviado para a lixeira no GLPI por %2$s."
+
+msgid "Cancelled automatically because Ticket #%1$d was permanently purged from GLPI."
+msgstr "Cancelada automaticamente porque o Chamado #%1$d foi permanentemente excluído do GLPI."
+
 

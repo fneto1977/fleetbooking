@@ -20,6 +20,7 @@ class Request extends CommonDBTM
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
     const STATUS_CONFLICT = 'conflict';
+    const STATUS_CANCELLED = 'cancelled';
 
     /**
      * Get the descriptive name of the item
@@ -317,10 +318,11 @@ class Request extends CommonDBTM
     public static function getAllStatuses()
     {
         return [
-            self::STATUS_PENDING  => __('Pending', 'fleetbooking'),
-            self::STATUS_APPROVED => __('Approved', 'fleetbooking'),
-            self::STATUS_REJECTED => __('Rejected', 'fleetbooking'),
-            self::STATUS_CONFLICT => __('Conflict', 'fleetbooking'),
+            self::STATUS_PENDING   => __('Pending', 'fleetbooking'),
+            self::STATUS_APPROVED  => __('Approved', 'fleetbooking'),
+            self::STATUS_REJECTED  => __('Rejected', 'fleetbooking'),
+            self::STATUS_CONFLICT  => __('Conflict', 'fleetbooking'),
+            self::STATUS_CANCELLED => __('Cancelled', 'fleetbooking'),
         ];
     }
 

@@ -5,8 +5,14 @@ namespace {
         define('READ', 1);
     }
 
+    if (!class_exists('CommonGLPI')) {
+        class CommonGLPI {
+            public function getType(): string { return 'CommonGLPI'; }
+        }
+    }
+
     if (!class_exists('CommonDBTM')) {
-        class CommonDBTM {
+        class CommonDBTM extends CommonGLPI {
             public array $fields = [];
             public function getID(): int {
                 return (int) ($this->fields['id'] ?? 0);
@@ -221,6 +227,29 @@ namespace GlpiPlugin\Fleetbooking\Tests {
         {
             $this->assertFalse(ApprovalService::isInApprovalProcess());
             $this->assertFalse(CancelService::isInCancellationProcess());
+        }
+
+        public function testTechnicianWithCancelRightCanSeeTicketTab(): void
+        {
+            $req = new Request();
+            $ticket = new class extends \CommonGLPI {
+                public function getType(): string { return 'Ticket'; }
+            };
+
+            // Without cancel or approve or admin or read rights
+            $_SESSION['glpiactiveprofile']['fleetbooking_approve'] = 0;
+            $_SESSION['glpiactiveprofile']['fleetbooking_admin'] = 0;
+            $_SESSION['glpiactiveprofile']['fleetbooking_cancel'] = 0;
+            $_SESSION['glpiactiveprofile']['fleetbooking_read'] = 0;
+            $this->assertSame('', $req->getTabNameForItem($ticket));
+
+            // With only fleetbooking_cancel right (Technician scenario)
+            $_SESSION['glpiactiveprofile']['fleetbooking_cancel'] = 1;
+            $tabName = $req->getTabNameForItem($ticket);
+            $this->assertTrue(!empty($tabName), 'Technician with fleetbooking_cancel right must see Ticket tab.');
+
+            // Verify canView also allows fleetbooking_cancel
+            $this->assertTrue(Request::canView(), 'Request::canView must return true for fleetbooking_cancel right.');
         }
 
         protected function assertTrue($val, string $msg = ''): void

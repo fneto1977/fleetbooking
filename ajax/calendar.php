@@ -3,8 +3,8 @@ include("../../../inc/includes.php");
 
 header('Content-Type: application/json');
 
-if (!Session::haveRight("fleetbooking_request", READ) && !Session::haveRight("fleetbooking_approve", READ) && !Session::haveRight("fleetbooking_admin", READ)) {
-    \Toolbox::logInFile('fleetbooking', '[calendar.php] Permission denied — user lacks fleetbooking_request, fleetbooking_approve, and fleetbooking_admin rights.');
+if (!Session::haveRight("fleetbooking_request", READ) && !Session::haveRight("fleetbooking_approve", READ) && !Session::haveRight("fleetbooking_cancel", READ) && !Session::haveRight("fleetbooking_admin", READ)) {
+    \Toolbox::logInFile('fleetbooking', '[calendar.php] Permission denied — user lacks fleetbooking_request, fleetbooking_approve, fleetbooking_cancel, and fleetbooking_admin rights.');
     echo json_encode(['error' => __('Permission denied', 'fleetbooking')]);
     exit;
 }

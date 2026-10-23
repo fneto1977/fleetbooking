@@ -30,11 +30,13 @@ try {
         }
 
         $isManager = ((int) $reqData['manager_users_id'] === (int) Session::getLoginUserID()
-            && (int) $reqData['manager_users_id'] > 0) || $isTechnician;
+            && (int) $reqData['manager_users_id'] > 0);
         $isAdmin = Session::haveRight('fleetbooking_admin', READ);
+        $hasApproveRight = Session::haveRight('fleetbooking_approve', READ);
+        $hasCancelRight = Session::haveRight('fleetbooking_cancel', READ);
         $isGlpiAdmin = Session::haveRight('config', UPDATE);
-        $showCalendar = ($isManager || $isAdmin || $isGlpiAdmin);
-        $canDecide = ($isManager || $isAdmin) && ($reqData['status'] === 'pending');
+        $showCalendar = ($isManager || $isAdmin || $isGlpiAdmin || $hasCancelRight || $isTechnician);
+        $canDecide = (($isManager && $hasApproveRight) || $isAdmin) && ($reqData['status'] === 'pending');
 
         $cancelService = new \GlpiPlugin\Fleetbooking\Service\CancelService();
         $canCancel = $cancelService->canCancel($request, (int) Session::getLoginUserID());

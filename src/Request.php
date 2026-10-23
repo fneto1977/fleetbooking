@@ -48,6 +48,7 @@ class Request extends CommonDBTM
         return \Session::haveRight('fleetbooking_read', READ)
             || \Session::haveRight(self::$rightname, READ)
             || \Session::haveRight('fleetbooking_approve', READ)
+            || \Session::haveRight('fleetbooking_cancel', READ)
             || \Session::haveRight('fleetbooking_admin', READ);
     }
 
@@ -287,7 +288,12 @@ class Request extends CommonDBTM
     public function getTabNameForItem(\CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() === 'Ticket') {
-            if (\Session::haveRight('fleetbooking_approve', READ) || \Session::haveRight('fleetbooking_admin', READ)) {
+            if (
+                \Session::haveRight('fleetbooking_approve', READ)
+                || \Session::haveRight('fleetbooking_admin', READ)
+                || \Session::haveRight('fleetbooking_cancel', READ)
+                || \Session::haveRight('fleetbooking_read', READ)
+            ) {
                 if (method_exists(__CLASS__, 'createTabEntry')) {
                     return self::createTabEntry(__('Fleet Approval', 'fleetbooking'), 0, $item->getType(), self::getIcon());
                 }

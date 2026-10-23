@@ -173,6 +173,7 @@ class ApprovalService
                         str_replace(["\n", "\r", "\t"], ' ', $termEx->getMessage())
                     ));
                 }
+            } else {
                 \Toolbox::logInFile('fleetbooking', sprintf(
                     __('Request #%s REJECTED: vehicle %s %s, period %s to %s, manager %s, comment: %s.', 'fleetbooking'),
                     $lockedRequest->getID(),

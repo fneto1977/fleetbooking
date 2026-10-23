@@ -85,6 +85,13 @@ if (!class_exists('PHPUnit\Framework\TestCase')) {
             }
         }
 
+        protected function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
+        {
+            if (!preg_match($pattern, $string)) {
+                throw new \RuntimeException("$message\nPattern '$pattern' did not match string.");
+            }
+        }
+
         protected function fail(string $message): never
         {
             throw new \RuntimeException($message);
@@ -356,6 +363,25 @@ class FixesReviewTest extends TestCase
             'to trigger GLPI lifecycle hooks.'
         );
     }
+
+    /**
+     * Verify that approval logic is mutually exclusive with rejection logic,
+     * ensuring approval never adds a rejection followup to the ticket.
+     */
+    public function testApprovalDoesNotTriggerRejectionFollowup(): void
+    {
+        $path = dirname(__DIR__) . '/src/Service/ApprovalService.php';
+        $this->assertFileExists($path);
+        $source = file_get_contents($path);
+
+        // Verify that '} else {' exists between the approval term creation and rejection
+        $pattern = '/if\s*\(\$decision\s*===\s*Request::STATUS_APPROVED\)\s*\{.*ResponsibilityTermService.*\}\s*else\s*\{.*Request #%s REJECTED/s';
+        $this->assertMatchesRegularExpression(
+            $pattern,
+            $source,
+            'ApprovalService must have an "else" branch separating approval and rejection logic.'
+        );
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -423,6 +449,15 @@ if (PHP_SAPI === 'cli' && realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
         $passed++;
     } catch (\Throwable $e) {
         echo "  ✗ testApprovalServiceTriggersHydrationLifecycle: {$e->getMessage()}\n";
+        $failed++;
+    }
+
+    try {
+        $test->testApprovalDoesNotTriggerRejectionFollowup();
+        echo "  ✓ testApprovalDoesNotTriggerRejectionFollowup\n";
+        $passed++;
+    } catch (\Throwable $e) {
+        echo "  ✗ testApprovalDoesNotTriggerRejectionFollowup: {$e->getMessage()}\n";
         $failed++;
     }
 
